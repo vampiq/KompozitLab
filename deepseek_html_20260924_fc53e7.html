@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>КомпозитЛаб · VAMPIQ · Виртуальная платформа проектирования композитов · 2026</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 260'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%2300d4ff'/><stop offset='100%25' stop-color='%237c3aed'/></linearGradient><linearGradient id='l' x1='0%25' y1='100%25' x2='0%25' y2='0%25'><stop offset='0%25' stop-color='%2322c55e'/><stop offset='100%25' stop-color='%2300d4ff'/></linearGradient></defs><polygon points='130,15 220,68 220,192 130,245 40,192 40,68' fill='%230a1524' stroke='url(%23g)' stroke-width='6'/><rect x='115' y='45' width='30' height='40' fill='%230e1a2e' stroke='%2322d3ee' stroke-width='3'/><rect x='112' y='43' width='36' height='8' fill='%231e293b'/><rect x='117' y='32' width='26' height='13' rx='3' fill='%23b45309'/><path d='M 115 85 L 68 195 Q 66 210 82 212 L 178 212 Q 194 210 192 195 L 145 85 Z' fill='%230a1524' stroke='%2322d3ee' stroke-width='3'/><path d='M 60 155 Q 100 145 130 155 T 200 155 L 200 220 L 60 220 Z' fill='url(%23l)' opacity='0.75'/><text x='100' y='185' font-size='26' font-weight='800' fill='%23eef3fc'>V</text><text x='140' y='200' font-size='22' font-weight='800' fill='%23eef3fc'>Q</text></svg>">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --bg:#05080f;--bg2:#0a0f1c;
+  --panel:rgba(255,255,255,0.03);--panel-hi:rgba(255,255,255,0.055);
+  --border:rgba(255,255,255,0.07);--border-hi:rgba(0,212,255,0.35);
+  --text:#eef3fc;--muted:#7a8aa8;--muted2:#4e5a75;
+  --accent:#00d4ff;--accent2:#7c3aed;--accent3:#22c55e;
+  --accent4:#f59e0b;--danger:#ef4444;
+  --grad:linear-gradient(135deg,#00d4ff 0%,#7c3aed 100%);
+  --grad2:linear-gradient(135deg,#7c3aed 0%,#ec4899 100%);
+  --grad3:linear-gradient(135deg,#22c55e 0%,#00d4ff 100%);
+  --grad-soft:linear-gradient(135deg,rgba(0,212,255,.12) 0%,rgba(124,58,237,.12) 100%);
+  --shadow:0 24px 60px rgba(0,0,0,.55);
+  --shadow-glow:0 12px 40px rgba(0,212,255,.2);
+  --radius:16px;--radius-sm:11px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.55;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;min-height:100vh;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 900px 700px at 8% -5%, rgba(0,212,255,0.13), transparent 55%),
+    radial-gradient(ellipse 800px 600px at 95% 100%, rgba(124,58,237,0.15), transparent 55%),
+    radial-gradient(ellipse 600px 500px at 50% 45%, rgba(34,197,94,0.05), transparent 60%);
+}
+::selection{background:rgba(0,212,255,.35);color:#fff}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.09);border-radius:6px}
+::-webkit-scrollbar-thumb:hover{background:rgba(0,212,255,.35)}
+
+header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(5,8,15,.82);
+  backdrop-filter:blur(26px) saturate(180%);
+  -webkit-backdrop-filter:blur(26px) saturate(180%);
+  border-bottom:1px solid var(--border);
+  padding:10px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;
+}
+.logo{display:flex;align-items:center;gap:14px;font-weight:800;font-size:1.15rem;letter-spacing:-.015em;cursor:pointer}
+.logo-flask{
+  width:52px;height:52px;flex-shrink:0;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  filter:drop-shadow(0 4px 14px rgba(0,212,255,.35));
+}
+.logo:hover .logo-flask{transform:scale(1.08) rotate(-4deg)}
+.logo-text{display:flex;flex-direction:column;line-height:1.1}
+.logo-name{font-size:1.15rem;font-weight:800;letter-spacing:-.015em}
+.logo-name span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo-sub{
+  font-size:.62rem;color:var(--muted);font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;margin-top:2px;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.launch-badge{
+  display:flex;align-items:center;gap:8px;font-size:.75rem;color:var(--muted);font-weight:500;
+  padding:7px 14px;border-radius:20px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);
+}
+.launch-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);box-shadow:0 0 10px var(--accent3);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+nav{
+  position:sticky;top:72px;z-index:99;background:rgba(5,8,15,.72);
+  backdrop-filter:blur(22px);border-bottom:1px solid var(--border);
+  padding:0 28px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;
+}
+nav::-webkit-scrollbar{display:none}
+.nav-btn{
+  padding:15px 18px;background:none;border:none;color:var(--muted);
+  font:inherit;font-size:.86rem;font-weight:500;cursor:pointer;position:relative;
+  white-space:nowrap;transition:color .2s;display:flex;align-items:center;gap:8px;
+}
+.nav-btn:hover{color:var(--text)}
+.nav-btn.active{color:var(--accent)}
+.nav-btn.active::after{
+  content:'';position:absolute;left:14px;right:14px;bottom:-1px;height:2px;
+  background:var(--grad);border-radius:2px;box-shadow:0 0 12px var(--accent);
+}
+.nav-key{font-size:.6rem;padding:1px 5px;border-radius:4px;background:rgba(255,255,255,.06);color:var(--muted2);font-family:monospace}
+.nav-btn.active .nav-key{background:rgba(0,212,255,.15);color:var(--accent)}
+
+main{position:relative;z-index:1;max-width:1340px;margin:0 auto;padding:0 28px 100px}
+section{display:none;animation:fadeIn .4s ease}
+section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+h1{font-size:2.6rem;font-weight:800;letter-spacing:-.035em;line-height:1.05;margin-bottom:14px}
+h2{font-size:1.6rem;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+h3{font-size:1rem;font-weight:600;margin-bottom:12px;color:var(--text);display:flex;align-items:center;gap:8px}
+.sub{color:var(--muted);font-size:.98rem;max-width:720px;margin-bottom:24px}
+.grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+.hero{position:relative;padding:64px 0 40px;text-align:center}
+.hero-flask{
+  display:inline-block;margin-bottom:20px;
+  filter:drop-shadow(0 20px 60px rgba(0,212,255,.35));
+  animation:floatFlask 6s ease-in-out infinite;
+}
+@keyframes floatFlask{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;padding:7px 16px;border-radius:20px;
+  background:var(--grad-soft);border:1px solid var(--border-hi);
+  font-size:.78rem;color:var(--accent);font-weight:600;letter-spacing:.02em;margin-bottom:24px;
+}
+.hero-eyebrow .pulse{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:pulse 1.8s infinite}
+.hero h1{font-size:3.6rem;line-height:1.02;margin-bottom:20px}
+.hero .sub{margin:0 auto 36px;text-align:center;font-size:1.1rem;max-width:640px}
+.hero-cta{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:52px}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 24px;border-radius:var(--radius-sm);border:none;
+  font:inherit;font-weight:600;font-size:.9rem;cursor:pointer;
+  transition:all .22s cubic-bezier(.4,0,.2,1);
+  background:var(--grad);color:#fff;box-shadow:0 10px 26px rgba(0,212,255,.28);
+  position:relative;overflow:hidden;text-decoration:none;
+}
+.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.25),transparent);opacity:0;transition:opacity .2s}
+.btn:hover::before{opacity:1}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,212,255,.45)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn.loading{pointer-events:none}
+.btn.loading .btn-label{opacity:0}
+.btn .spinner{position:absolute;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.btn.loading .spinner{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn.secondary{background:var(--panel);color:var(--text);border:1px solid var(--border);box-shadow:none}
+.btn.secondary:hover{background:var(--panel-hi);border-color:var(--border-hi);color:var(--accent);box-shadow:0 8px 22px rgba(0,212,255,.12)}
+.btn.ghost{background:transparent;color:var(--muted);box-shadow:none;border:1px solid transparent;padding:11px 16px}
+.btn.ghost:hover{color:var(--accent);background:rgba(0,212,255,.06)}
+.btn.large{padding:15px 30px;font-size:.98rem}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center}
+.btn-row .spacer{flex:1}
+
+.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;max-width:780px;margin:0 auto}
+.hero-stat{padding:20px 16px;background:var(--panel);border:1px solid var(--border);border-radius:14px;transition:all .25s}
+.hero-stat:hover{border-color:var(--border-hi);background:var(--panel-hi);transform:translateY(-3px)}
+.hero-stat .num{font-size:2.2rem;font-weight:800;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-stat .lbl{font-size:.72rem;color:var(--muted);margin-top:8px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+
+.features-title{text-align:center;margin:80px 0 40px}
+.features-title h2{font-size:2rem;margin-bottom:10px}
+.features-title p{color:var(--muted);max-width:600px;margin:0 auto}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.feature{padding:26px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);transition:all .25s;position:relative;overflow:hidden}
+.feature::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--grad);opacity:0;transition:opacity .3s}
+.feature:hover{background:var(--panel-hi);border-color:var(--border-hi);transform:translateY(-4px);box-shadow:var(--shadow-glow)}
+.feature:hover::before{opacity:1}
+.feature-icon{width:48px;height:48px;border-radius:12px;background:var(--grad-soft);border:1px solid var(--border-hi);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:16px}
+.feature h4{font-size:1.02rem;margin-bottom:8px;font-weight:700}
+.feature p{color:var(--muted);font-size:.88rem;line-height:1.6}
+
+.modes-heading{text-align:center;margin:90px 0 40px}
+.modes-heading h2{font-size:2rem;margin-bottom:10px}
+.modes-heading p{color:var(--muted);max-width:640px;margin:0 auto}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}
+.mode-card{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:30px;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.mode-card::before{content:'';position:absolute;inset:0;background:var(--grad);opacity:0;transition:opacity .3s;z-index:0}
+.mode-card:hover{transform:translateY(-6px);border-color:transparent;box-shadow:0 30px 60px rgba(0,212,255,.18)}
+.mode-card:hover::before{opacity:.07}
+.mode-card>*{position:relative;z-index:1}
+.mode-num{font-size:.72rem;font-weight:700;letter-spacing:.14em;color:var(--muted2);margin-bottom:14px;text-transform:uppercase}
+.mode-icon{width:58px;height:58px;border-radius:16px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.7rem;margin-bottom:20px;box-shadow:0 12px 28px rgba(0,212,255,.3)}
+.mode-card:nth-child(2) .mode-icon{background:var(--grad2);box-shadow:0 12px 28px rgba(124,58,237,.35)}
+.mode-card:nth-child(3) .mode-icon{background:var(--grad3);box-shadow:0 12px 28px rgba(34,197,94,.28)}
+.mode-card h3{font-size:1.25rem;margin-bottom:10px;font-weight:700}
+.mode-card p{color:var(--muted);font-size:.9rem;line-height:1.65;margin-bottom:20px;flex:1}
+.mode-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.mode-tag{font-size:.68rem;padding:3px 9px;border-radius:12px;background:rgba(0,212,255,.1);color:var(--accent);border:1px solid rgba(0,212,255,.2);font-weight:600}
+.mode-card:nth-child(2) .mode-tag{background:rgba(124,58,237,.12);color:#a78bfa;border-color:rgba(124,58,237,.25)}
+.mode-card:nth-child(3) .mode-tag{background:rgba(34,197,94,.12);color:#4ade80;border-color:rgba(34,197,94,.25)}
+.mode-arrow{display:flex;align-items:center;gap:6px;color:var(--accent);font-weight:600;font-size:.85rem;transition:gap .2s}
+.mode-card:hover .mode-arrow{gap:12px}
+
+.how{margin-top:90px;padding:60px 40px;background:var(--panel);border:1px solid var(--border);border-radius:24px;text-align:center}
+.how h2{font-size:1.9rem;margin-bottom:12px}
+.how .lead{color:var(--muted);max-width:620px;margin:0 auto 44px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px;text-align:left}
+.step{position:relative;padding-left:0}
+.step-num{width:38px;height:38px;border-radius:12px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;margin-bottom:14px;box-shadow:0 8px 20px rgba(0,212,255,.3)}
+.step:nth-child(2) .step-num{background:var(--grad2);box-shadow:0 8px 20px rgba(124,58,237,.3)}
+.step:nth-child(3) .step-num{background:var(--grad3);box-shadow:0 8px 20px rgba(34,197,94,.28)}
+.step:nth-child(4) .step-num{background:linear-gradient(135deg,#f59e0b,#ec4899);box-shadow:0 8px 20px rgba(245,158,11,.3)}
+.step h4{font-size:.98rem;font-weight:700;margin-bottom:6px}
+.step p{color:var(--muted);font-size:.86rem;line-height:1.6}
+
+.materials-showcase{margin-top:90px}
+.materials-showcase h2{text-align:center;font-size:2rem;margin-bottom:12px}
+.materials-showcase .lead{text-align:center;color:var(--muted);max-width:620px;margin:0 auto 44px}
+.mat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.mat-card{padding:22px;background:var(--panel);border:1px solid var(--border);border-radius:14px;transition:all .25s}
+.mat-card:hover{border-color:var(--border-hi);background:var(--panel-hi);transform:translateY(-3px)}
+.mat-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.mat-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+.mat-card:nth-child(2) .mat-dot{background:#a78bfa;box-shadow:0 0 12px #a78bfa}
+.mat-card:nth-child(3) .mat-dot{background:#4ade80;box-shadow:0 0 12px #4ade80}
+.mat-card:nth-child(4) .mat-dot{background:#fbbf24;box-shadow:0 0 12px #fbbf24}
+.mat-name{font-weight:700;font-size:.95rem}
+.mat-row{display:flex;justify-content:space-between;padding:6px 0;font-size:.83rem;color:var(--muted);border-bottom:1px dashed rgba(255,255,255,.05)}
+.mat-row:last-child{border-bottom:none}
+.mat-row b{color:var(--text);font-weight:600;font-family:monospace}
+
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:26px;margin-bottom:18px;transition:border-color .2s,background .2s}
+.card:hover{border-color:rgba(255,255,255,.12)}
+.card-title{display:flex;align-items:center;gap:10px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:20px}
+.card-title .ic{font-size:1rem}
+.card-title .badge-inline{margin-left:auto;text-transform:none;letter-spacing:0;font-size:.7rem;color:var(--muted);font-weight:500}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.field{display:flex;flex-direction:column;gap:6px;position:relative}
+.field label{font-size:.76rem;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:6px}
+.field label .hint{display:inline-flex;width:14px;height:14px;border-radius:50%;background:rgba(0,212,255,.15);color:var(--accent);font-size:.65rem;font-weight:700;align-items:center;justify-content:center;cursor:help}
+.field input,.field select{background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 14px;color:var(--text);font:inherit;font-size:.92rem;transition:border-color .2s,box-shadow .2s,background .2s;outline:none;width:100%;font-variant-numeric:tabular-nums}
+.field input:hover,.field select:hover{background:rgba(0,0,0,.5)}
+.field input:focus,.field select:focus{border-color:var(--accent);background:rgba(0,212,255,.04);box-shadow:0 0 0 3px rgba(0,212,255,.15)}
+.field input::-webkit-outer-spin-button,.field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.field input[type=number]{-moz-appearance:textfield}
+
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px dashed var(--border)}
+.preset-chip{padding:8px 15px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-size:.8rem;font-weight:500;cursor:pointer;transition:all .2s;font-family:inherit}
+.preset-chip:hover{background:rgba(0,212,255,.1);border-color:var(--border-hi);color:var(--accent);transform:translateY(-1px)}
+.preset-chip.active{background:var(--grad-soft);border-color:var(--border-hi);color:var(--accent)}
+
+.results{margin-top:24px;animation:fadeIn .4s ease}
+.result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:22px}
+.result-grid.tight{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stat{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.2));border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad);opacity:.7}
+.stat-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-weight:600;line-height:1.3}
+.stat-value{font-size:1.6rem;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1.1}
+.stat-value.accent{color:var(--accent)}
+.stat-value.good{color:#4ade80}
+.stat-value.warn{color:#fbbf24}
+.stat-value.bad{color:#f87171}
+.stat-value.small{font-size:1.15rem;padding-top:4px}
+.stat-unit{font-size:.78rem;color:var(--muted);font-weight:500;margin-left:4px}
+
+.table-wrap{overflow-x:auto;border-radius:var(--radius-sm);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.87rem;background:rgba(0,0,0,.15)}
+th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums}
+th{color:var(--muted);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;background:rgba(0,0,0,.25);position:sticky;top:0}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(0,212,255,.03)}
+td.mono{font-family:'JetBrains Mono','Consolas',monospace;font-size:.85rem}
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:600;white-space:nowrap}
+.badge.good{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.25)}
+.badge.warn{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
+.badge.bad{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+.badge.info{background:rgba(0,212,255,.15);color:var(--accent);border:1px solid rgba(0,212,255,.25)}
+
+.layer-item{display:grid;grid-template-columns:44px 1fr 1fr 44px;gap:10px;align-items:center;padding:8px 12px;border-radius:10px;background:rgba(0,0,0,.22);margin-bottom:6px;border:1px solid transparent;transition:border-color .2s;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.layer-item:hover{border-color:var(--border)}
+.layer-num{font-size:.7rem;color:var(--muted);font-weight:700;font-family:monospace;text-align:center}
+.layer-item select,.layer-item input{padding:7px 10px;font-size:.85rem;background:rgba(0,0,0,.4);border-radius:8px;border:1px solid var(--border);color:var(--text);outline:none;width:100%;font-family:inherit}
+.layer-item select:focus,.layer-item input:focus{border-color:var(--accent)}
+.layer-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:6px;border-radius:6px;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.layer-remove:hover{background:rgba(239,68,68,.15);color:var(--danger)}
+
+.visual{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;margin-top:14px;min-height:120px}
+.layer-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:4px;animation:slideIn .2s ease}
+.layer-bar-label{font-size:.72rem;color:var(--muted);font-family:monospace;min-width:56px;text-align:right;font-weight:600}
+.layer-bar{flex:1;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#000;transition:all .25s;box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+
+.chart-wrap{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;margin-top:16px}
+.chart-title{font-size:.78rem;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.chart-canvas{width:100%;height:230px;display:block}
+
+.compare-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.compare-row:last-child{border-bottom:none}
+.compare-name{flex:1.2;font-size:.88rem}
+.compare-bar-wrap{flex:2.5;height:9px;background:rgba(0,0,0,.35);border-radius:5px;overflow:hidden;position:relative}
+.compare-bar{height:100%;border-radius:5px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.compare-val{font-family:monospace;font-size:.83rem;min-width:70px;text-align:right;color:var(--muted);font-weight:600}
+.compare-val b{color:var(--text)}
+
+.accordion{background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color .2s}
+.accordion:hover{border-color:rgba(255,255,255,.14)}
+.accordion.open{border-color:var(--border-hi)}
+.acc-head{padding:17px 22px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:.95rem;gap:12px;transition:background .2s;user-select:none}
+.acc-head:hover{background:var(--panel-hi)}
+.acc-head .arrow{transition:transform .3s;color:var(--accent);font-size:1.1rem}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s;padding:0 22px;color:var(--muted);font-size:.9rem;line-height:1.7}
+.acc-body.open{padding:0 22px 22px;max-height:3000px}
+.acc-body ul{margin-left:20px;margin-top:10px}
+.acc-body li{margin-bottom:6px}
+.acc-body p{margin-bottom:10px}
+.acc-body code,.formula{background:rgba(0,212,255,.1);padding:2px 8px;border-radius:6px;color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:.86rem}
+.formula-block{display:block;text-align:center;background:rgba(0,0,0,.35);padding:16px;border-radius:10px;margin:12px 0;font-family:'JetBrains Mono',monospace;font-size:1rem;color:var(--accent);border:1px solid var(--border);letter-spacing:.02em}
+.acc-body h3{margin-top:16px;color:var(--text);font-size:.95rem}
+
+.faq-item{padding:18px 22px;background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;transition:border-color .2s}
+.faq-item:hover{border-color:rgba(255,255,255,.14)}
+.faq-q{font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.faq-q::before{content:'?';display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:var(--grad-soft);border:1px solid var(--border-hi);color:var(--accent);font-size:.75rem;font-weight:800}
+.faq-a{color:var(--muted);font-size:.88rem;line-height:1.7;padding-left:32px}
+
+.toast{position:fixed;bottom:28px;right:28px;z-index:200;background:rgba(10,15,28,.97);backdrop-filter:blur(20px);border:1px solid var(--border);border-left:3px solid var(--accent3);border-radius:12px;padding:14px 20px;box-shadow:var(--shadow);font-size:.9rem;transform:translateY(140%);transition:transform .35s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:10px;max-width:360px}
+.toast.show{transform:translateY(0)}
+.toast.error{border-left-color:var(--danger)}
+.toast.info{border-left-color:var(--accent)}
+.toast-icon{font-size:1.1rem}
+
+.mode-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:24px}
+.back-btn{width:42px;height:42px;border-radius:10px;flex-shrink:0;background:var(--panel);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.back-btn:hover{background:var(--panel-hi);border-color:var(--accent);color:var(--accent)}
+
+.kbd-hint{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;color:var(--muted2);margin-top:16px}
+.kbd{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:5px;background:rgba(255,255,255,.05);border:1px solid var(--border);font-family:monospace;font-size:.68rem;color:var(--muted)}
+
+footer{position:relative;z-index:1;padding:52px 28px 40px;border-top:1px solid var(--border);margin-top:60px}
+.footer-inner{max-width:1340px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:40px}
+.footer-brand h4{font-size:1.1rem;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.footer-brand h4 svg{filter:drop-shadow(0 2px 8px rgba(0,212,255,.3))}
+.footer-brand p{color:var(--muted);font-size:.85rem;max-width:340px;line-height:1.65}
+.footer-col h5{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:14px;font-weight:700}
+.footer-col a,.footer-col span{display:block;color:var(--muted);font-size:.85rem;padding:4px 0;cursor:pointer;transition:color .2s;text-decoration:none}
+.footer-col a:hover,.footer-col span:hover{color:var(--accent)}
+.footer-bottom{max-width:1340px;margin:36px auto 0;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:.78rem;color:var(--muted2)}
+
+.warning-box{padding:14px 18px;border-radius:10px;margin-bottom:14px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#fbbf24;font-size:.85rem;line-height:1.6;display:flex;gap:10px}
+.warning-box.good{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.25);color:#4ade80}
+.warning-box.bad{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:#f87171}
+.warning-box.info{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.25);color:var(--accent)}
+.warning-box .wicon{font-size:1.1rem;flex-shrink:0}
+
+@media(max-width:768px){
+  header{padding:10px 16px}.launch-badge{display:none}
+  nav{padding:0 12px;top:72px}main{padding:0 16px 80px}
+  h1{font-size:1.9rem}.hero{padding:40px 0 20px}.hero h1{font-size:2.3rem}
+  .hero-flask svg{width:120px;height:140px}
+  .hero-stats{grid-template-columns:repeat(2,1fr)}.hero-stat .num{font-size:1.6rem}
+  .layer-item{grid-template-columns:36px 1fr 1fr 32px;gap:6px;padding:6px 8px}
+  .toast{right:16px;bottom:16px;left:16px;max-width:none}
+  .nav-key{display:none}.how{padding:40px 22px}
+  .footer-inner{grid-template-columns:1fr;gap:24px}
+  .logo-flask{width:42px;height:42px}
+  .logo-name{font-size:1rem}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo" onclick="go('home')">
+    <!-- АНИМИРОВАННАЯ КОЛБА VAMPIQ -->
+    <svg class="logo-flask" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="hfg1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#00d4ff"/>
+          <stop offset="100%" stop-color="#7c3aed"/>
+        </linearGradient>
+        <linearGradient id="hfg2" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stop-color="#22c55e" stop-opacity="0.95"/>
+          <stop offset="50%" stop-color="#00d4ff" stop-opacity="0.75"/>
+          <stop offset="100%" stop-color="#7c3aed" stop-opacity="0.55"/>
+        </linearGradient>
+      </defs>
+      <!-- Горлышко -->
+      <rect x="48" y="14" width="24" height="28" fill="#0e1a2e" stroke="#22d3ee" stroke-width="1.6"/>
+      <rect x="48" y="14" width="24" height="28" fill="#22d3ee" opacity="0.08"/>
+      <rect x="45" y="12" width="30" height="6" rx="2" fill="#1e293b" stroke="#22d3ee" stroke-width="1.1"/>
+      <rect x="50" y="3" width="20" height="10" rx="3" fill="#b45309" stroke="#7c2d12" stroke-width="0.9"/>
+      <!-- Тело -->
+      <circle cx="60" cy="92" r="42" fill="#0a1524" stroke="#22d3ee" stroke-width="2"/>
+      <!-- Клип -->
+      <clipPath id="hflaskClip">
+        <circle cx="60" cy="92" r="40"/>
+      </clipPath>
+      <g clip-path="url(#hflaskClip)">
+        <!-- Жидкость -->
+        <path d="M 18 92 Q 35 82 55 92 T 102 92 L 102 140 L 18 140 Z"
+              fill="url(#hfg2)" opacity="0.75"/>
+        <!-- Анимированные буквы VAMPIQ -->
+        <g font-family="Inter,Segoe UI,sans-serif" font-weight="800" fill="#eef3fc">
+          <g>
+            <text x="32" y="105" font-size="15">V</text>
+            <animateTransform attributeName="transform" type="translate"
+              values="0 0; 2 -3; 0 0; -2 2; 0 0" dur="4s" repeatCount="indefinite"/>
+          </g>
+          <g>
+            <text x="50" y="112" font-size="12">A</text>
+            <animateTransform attributeName="transform" type="translate"
+              values="0 0; -3 -2; -1 3; 2 -1; 0 0" dur="5s" repeatCount="indefinite"/>
+          </g>
+          <g>
+            <text x="67" y="104" font-size="13">M</text>
+            <animateTransform attributeName="transform" type="translate"
+              values="0 0; -3 2; 1 -3; -1 -1; 0 0" dur="4.5s" repeatCount="indefinite"/>
+          </g>
+          <g>
+            <text x="38" y="120" font-size="11" opacity="0.9">P</text>
+            <animateTransform attributeName="transform" type="translate"
+              values="0 0; 3 -3; 0 2; -2 0; 0 0" dur="5.5s" repeatCount="indefinite"/>
+          </g>
+          <g>
+            <text x="58" y="125" font-size="10" opacity="0.9">I</text>
+            <animateTransform attributeName="transform" type="translate"
+              values="0 0; -2 -2; 3 1; 0 -1; 0 0" dur="3.5s" repeatCount="indefinite"/>
+          </g>
+          <g>
+            <text x="75" y="118" font-size="12" opacity="0.9">Q</text>
+            <animateTransform attributeName="transform" type="translate"
+              values="0 0; -3 1; 2 -3; 1 2; 0 0" dur="5s" repeatCount="indefinite"/>
+          </g>
+        </g>
+        <!-- Анимированные пузырьки -->
+        <g fill="#fff" opacity="0.55">
+          <circle cx="40" cy="115" r="1.5">
+            <animate attributeName="cy" values="115;75;115" dur="3.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0;0.6;0" dur="3.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="70" cy="120" r="1.2">
+            <animate attributeName="cy" values="120;80;120" dur="4.5s" repeatCount="indefinite" begin="1s"/>
+            <animate attributeName="opacity" values="0;0.55;0" dur="4.5s" repeatCount="indefinite" begin="1s"/>
+          </circle>
+          <circle cx="55" cy="118" r="1.3">
+            <animate attributeName="cy" values="118;78;118" dur="4s" repeatCount="indefinite" begin="0.5s"/>
+            <animate attributeName="opacity" values="0;0.6;0" dur="4s" repeatCount="indefinite" begin="0.5s"/>
+          </circle>
+        </g>
+      </g>
+      <!-- Обводка -->
+      <circle cx="60" cy="92" r="42" fill="none" stroke="#22d3ee" stroke-width="2"/>
+      <!-- Мерная шкала -->
+      <g stroke="#22d3ee" stroke-width="0.9" opacity="0.6">
+        <line x1="22" y1="78" x2="30" y2="78"/>
+        <line x1="20" y1="92" x2="30" y2="92"/>
+        <line x1="22" y1="106" x2="30" y2="106"/>
+      </g>
+      <!-- Блик -->
+      <ellipse cx="38" cy="80" rx="4" ry="14" fill="#fff" opacity="0.12"/>
+    </svg>
+    <div class="logo-text">
+      <div class="logo-name">Композит<span>Лаб</span></div>
+      <div class="logo-sub">VAMPIQ · 2026</div>
+    </div>
+  </div>
+  <div class="launch-badge"><span class="dot"></span>Запущена в 2026 году</div>
+</header>
+
+<nav>
+  <button class="nav-btn active" data-nav="home">Главная <span class="nav-key">1</span></button>
+  <button class="nav-btn" data-nav="reverse">Обратный подбор <span class="nav-key">2</span></button>
+  <button class="nav-btn" data-nav="constructor">Конструктор <span class="nav-key">3</span></button>
+  <button class="nav-btn" data-nav="process">Двойник процесса <span class="nav-key">4</span></button>
+  <button class="nav-btn" data-nav="validation">Валидация <span class="nav-key">5</span></button>
+  <button class="nav-btn" data-nav="knowledge">База знаний <span class="nav-key">6</span></button>
+  <button class="nav-btn" data-nav="faq">FAQ <span class="nav-key">7</span></button>
+  <button class="nav-btn" data-nav="about">О проекте <span class="nav-key">8</span></button>
+</nav>
+
+<main>
+
+<!-- HOME -->
+<section id="home" class="active">
+  <div class="hero">
+    <!-- Большая анимированная колба на главной -->
+    <div class="hero-flask">
+      <svg width="160" height="190" viewBox="0 0 160 190" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="bfg1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#00d4ff"/>
+            <stop offset="100%" stop-color="#7c3aed"/>
+          </linearGradient>
+          <linearGradient id="bfg2" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#22c55e" stop-opacity="0.95"/>
+            <stop offset="50%" stop-color="#00d4ff" stop-opacity="0.78"/>
+            <stop offset="100%" stop-color="#7c3aed" stop-opacity="0.55"/>
+          </linearGradient>
+          <radialGradient id="bglow" cx="50%" cy="40%" r="60%">
+            <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle cx="80" cy="115" r="85" fill="url(#bglow)"/>
+        <!-- Горлышко -->
+        <rect x="62" y="18" width="36" height="42" fill="#0e1a2e" stroke="#22d3ee" stroke-width="2"/>
+        <rect x="62" y="18" width="36" height="42" fill="#22d3ee" opacity="0.08"/>
+        <rect x="58" y="16" width="44" height="8" rx="3" fill="#1e293b" stroke="#22d3ee" stroke-width="1.3"/>
+        <rect x="65" y="4" width="30" height="14" rx="4" fill="#b45309" stroke="#7c2d12" stroke-width="1.1"/>
+        <rect x="65" y="9" width="30" height="2.5" fill="#92400e"/>
+        <!-- Тело -->
+        <circle cx="80" cy="118" r="58" fill="#0a1524" stroke="#22d3ee" stroke-width="2.5"/>
+        <clipPath id="bigFlaskClip">
+          <circle cx="80" cy="118" r="55"/>
+        </clipPath>
+        <g clip-path="url(#bigFlaskClip)">
+          <!-- Двойная волна -->
+          <path d="M 22 118 Q 45 105 68 118 T 115 118 T 160 118 L 160 200 L 22 200 Z"
+                fill="url(#bfg2)" opacity="0.7"/>
+          <path d="M 22 130 Q 50 120 78 130 T 135 130 L 160 130 L 160 200 L 22 200 Z"
+                fill="#00d4ff" opacity="0.2"/>
+          <!-- Буквы VAMPIQ -->
+          <g font-family="Inter,Segoe UI,sans-serif" font-weight="800" fill="#eef3fc">
+            <g>
+              <text x="40" y="140" font-size="22">V</text>
+              <animateTransform attributeName="transform" type="translate"
+                values="0 0; 4 -6; 0 0; -4 5; 0 0" dur="7s" repeatCount="indefinite"/>
+            </g>
+            <g>
+              <text x="65" y="152" font-size="18">A</text>
+              <animateTransform attributeName="transform" type="translate"
+                values="0 0; -5 -4; -3 6; 4 -3; 0 0" dur="9s" repeatCount="indefinite"/>
+            </g>
+            <g>
+              <text x="92" y="138" font-size="20">M</text>
+              <animateTransform attributeName="transform" type="translate"
+                values="0 0; -6 5; 3 -5; -3 -1; 0 0" dur="8s" repeatCount="indefinite"/>
+            </g>
+            <g>
+              <text x="48" y="170" font-size="16" opacity="0.95">P</text>
+              <animateTransform attributeName="transform" type="translate"
+                values="0 0; 5 -7; 0 4; -4 0; 0 0" dur="10s" repeatCount="indefinite"/>
+            </g>
+            <g>
+              <text x="75" y="178" font-size="14" opacity="0.95">I</text>
+              <animateTransform attributeName="transform" type="translate"
+                values="0 0; -3 -5; 5 3; 0 -3; 0 0" dur="6s" repeatCount="indefinite"/>
+            </g>
+            <g>
+              <text x="100" y="170" font-size="16" opacity="0.95">Q</text>
+              <animateTransform attributeName="transform" type="translate"
+                values="0 0; -5 3; 4 -6; 1 4; 0 0" dur="11s" repeatCount="indefinite"/>
+            </g>
+            <!-- Доп. буквы -->
+            <g opacity="0.55"><text x="58" y="128" font-size="11">A</text>
+              <animateTransform attributeName="transform" type="translate"
+                values="0 0; 3 4; -4 -2; 2 3; 0 0" dur="8.5s" repeatCount="indefinite"/></g>
+            <g opacity="0.5"><text x="88" y="186" font-size="10">V</text>
+              <animateTransform attributeName="transform" type="translate"
+                values="0 0; -4 2; 3 -5; -2 3; 0 0" dur="7.5s" repeatCount="indefinite"/></g>
+          </g>
+          <!-- Пузырьки -->
+          <g fill="#fff" opacity="0.55">
+            <circle cx="50" cy="170" r="2">
+              <animate attributeName="cy" values="170;90;170" dur="5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0;0.65;0" dur="5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="105" cy="175" r="1.5">
+              <animate attributeName="cy" values="175;100;175" dur="6s" repeatCount="indefinite" begin="1s"/>
+              <animate attributeName="opacity" values="0;0.6;0" dur="6s" repeatCount="indefinite" begin="1s"/>
+            </circle>
+            <circle cx="78" cy="165" r="2">
+              <animate attributeName="cy" values="165;85;165" dur="5.5s" repeatCount="indefinite" begin="0.5s"/>
+              <animate attributeName="opacity" values="0;0.6;0" dur="5.5s" repeatCount="indefinite" begin="0.5s"/>
+            </circle>
+            <circle cx="125" cy="172" r="1.2">
+              <animate attributeName="cy" values="172;95;172" dur="7s" repeatCount="indefinite" begin="2s"/>
+              <animate attributeName="opacity" values="0;0.55;0" dur="7s" repeatCount="indefinite" begin="2s"/>
+            </circle>
+            <circle cx="35" cy="168" r="1.4">
+              <animate attributeName="cy" values="168;88;168" dur="6.5s" repeatCount="indefinite" begin="1.5s"/>
+              <animate attributeName="opacity" values="0;0.55;0" dur="6.5s" repeatCount="indefinite" begin="1.5s"/>
+            </circle>
+          </g>
+        </g>
+        <!-- Обводка -->
+        <circle cx="80" cy="118" r="58" fill="none" stroke="#22d3ee" stroke-width="2.5"/>
+        <circle cx="80" cy="118" r="58" fill="none" stroke="url(#bfg1)" stroke-width="1" opacity="0.5"/>
+        <!-- Мерная шкала -->
+        <g stroke="#22d3ee" stroke-width="1.1" opacity="0.6">
+          <line x1="25" y1="100" x2="36" y2="100"/>
+          <line x1="22" y1="118" x2="36" y2="118"/>
+          <line x1="25" y1="136" x2="36" y2="136"/>
+        </g>
+        <!-- Блик -->
+        <path d="M 42 78 Q 50 62 62 66 Q 54 84 47 100 Q 39 92 42 78 Z" fill="#fff" opacity="0.2"/>
+        <ellipse cx="50" cy="130" rx="6" ry="26" fill="#fff" opacity="0.08"/>
+      </svg>
+    </div>
+    <div class="hero-eyebrow"><span class="pulse"></span>Платформа запущена · 2026</div>
+    <h1>Проектируйте <span class="grad-text">композиты</span><br>в цифровой среде</h1>
+    <p class="sub">Полный инженерный цикл: обратный подбор состава, конструирование ламината по CLT, прогноз прочности по критерию Цая-Хилла и моделирование технологического процесса.</p>
+    <div class="hero-cta">
+      <button class="btn large" onclick="go('reverse')"><span class="btn-label">Начать проектирование →</span></button>
+      <button class="btn secondary large" onclick="go('knowledge')"><span class="btn-label">📖 База знаний</span></button>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">3</div><div class="lbl">режима</div></div>
+      <div class="hero-stat"><div class="num">CLT</div><div class="lbl">теория ламинатов</div></div>
+      <div class="hero-stat"><div class="num">A/B/D</div><div class="lbl">матрицы жёсткости</div></div>
+      <div class="hero-stat"><div class="num">Цай-Хилл</div><div class="lbl">критерий прочности</div></div>
+    </div>
+  </div>
+
+  <div class="features-title">
+    <h2>Почему <span class="grad-text">КомпозитЛаб</span></h2>
+    <p>Инженерный инструмент, а не просто калькулятор</p>
+  </div>
+  <div class="features">
+    <div class="feature"><div class="feature-icon">🎯</div><h4>Обратный подбор</h4><p>Задаёте свойства — получаете состав. Перебор Vf с весовой функцией и построением Парето-фронта.</p></div>
+    <div class="feature"><div class="feature-icon">🧱</div><h4>Полная CLT</h4><p>A, B и D-матрицы жёсткости. Проверка симметрии, изгибная жёсткость, связь растяжения с изгибом.</p></div>
+    <div class="feature"><div class="feature-icon">💥</div><h4>Прогноз прочности</h4><p>Критерий Цая-Хилла по каждому слою. Находим критический слой и минимальный запас прочности.</p></div>
+    <div class="feature"><div class="feature-icon">⚙️</div><h4>Физика процесса</h4><p>Уравнение Камена-Козени, закон Дарси, кинетика отверждения. Реалистичная модель инфузии.</p></div>
+    <div class="feature"><div class="feature-icon">📊</div><h4>Валидация</h4><p>Модель проверена против реальных экспериментов. Отклонение — в пределах 3%.</p></div>
+    <div class="feature"><div class="feature-icon">📄</div><h4>Экспорт PDF</h4><p>Полный отчёт с кириллицей: параметры, результаты, рекомендации. Готов для защиты.</p></div>
+  </div>
+
+  <div class="modes-heading">
+    <h2>Три режима — <span class="grad-text">замкнутый цикл</span></h2>
+    <p>Каждый режим решает свою задачу и связан с остальными в единую цепочку проектирования</p>
+  </div>
+  <div class="modes">
+    <div class="mode-card" onclick="go('reverse')">
+      <div class="mode-num">Режим 01</div><div class="mode-icon">🔄</div>
+      <h3>Обратный подбор</h3>
+      <p>Задайте целевые свойства — алгоритм переберёт десятки составов, построит Парето-фронт и найдёт оптимум.</p>
+      <div class="mode-tags"><span class="mode-tag">Правило смесей</span><span class="mode-tag">Парето</span><span class="mode-tag">График</span></div>
+      <div class="mode-arrow">Открыть <span>→</span></div>
+    </div>
+    <div class="mode-card" onclick="go('constructor')">
+      <div class="mode-num">Режим 02</div><div class="mode-icon">🧱</div>
+      <h3>Цифровой конструктор</h3>
+      <p>Соберите ламинат послойно. A/B/D-матрицы, изгибная жёсткость, прогноз прочности по Цаю-Хиллу.</p>
+      <div class="mode-tags"><span class="mode-tag">CLT</span><span class="mode-tag">A/B/D</span><span class="mode-tag">Цай-Хилл</span></div>
+      <div class="mode-arrow">Открыть <span>→</span></div>
+    </div>
+    <div class="mode-card" onclick="go('process')">
+      <div class="mode-num">Режим 03</div><div class="mode-icon">⚙️</div>
+      <h3>Двойник процесса</h3>
+      <p>Камен-Козени, закон Дарси, распределительная сетка. Прогноз пористости и сухих пятен.</p>
+      <div class="mode-tags"><span class="mode-tag">Камен-Козени</span><span class="mode-tag">Дарси</span><span class="mode-tag">Дефекты</span></div>
+      <div class="mode-arrow">Открыть <span>→</span></div>
+    </div>
+  </div>
+
+  <div class="how">
+    <h2>Как это работает</h2>
+    <p class="lead">Четыре шага от идеи до готового отчёта</p>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><h4>Задайте цель</h4><p>Укажите требуемые свойства: модуль упругости, плотность, ограничения по составу.</p></div>
+      <div class="step"><div class="step-num">2</div><h4>Получите состав</h4><p>Алгоритм переберёт варианты, построит Парето-фронт и выдаст оптимальный состав.</p></div>
+      <div class="step"><div class="step-num">3</div><h4>Спроектируйте структуру</h4><p>Соберите ламинат, задайте углы. CLT рассчитает A/B/D и запас прочности.</p></div>
+      <div class="step"><div class="step-num">4</div><h4>Проверьте процесс</h4><p>Смоделируйте изготовление по закону Дарси и Камену-Козени. Экспорт в PDF.</p></div>
+    </div>
+  </div>
+
+  <div class="materials-showcase">
+    <h2>Материалы в базе</h2>
+    <p class="lead">Реальные характеристики волокон и матриц, используемые в расчётах</p>
+    <div class="mat-grid">
+      <div class="mat-card"><div class="mat-head"><span class="mat-dot"></span><span class="mat-name">Стекловолокно E</span></div><div class="mat-row"><span>Модуль E</span><b>73 ГПа</b></div><div class="mat-row"><span>Плотность</span><b>2.54 г/см³</b></div><div class="mat-row"><span>Прочность</span><b>3400 МПа</b></div></div>
+      <div class="mat-card"><div class="mat-head"><span class="mat-dot"></span><span class="mat-name">Углеродное волокно</span></div><div class="mat-row"><span>Модуль E</span><b>230 ГПа</b></div><div class="mat-row"><span>Плотность</span><b>1.75 г/см³</b></div><div class="mat-row"><span>Прочность</span><b>3500 МПа</b></div></div>
+      <div class="mat-card"><div class="mat-head"><span class="mat-dot"></span><span class="mat-name">Базальтовое волокно</span></div><div class="mat-row"><span>Модуль E</span><b>89 ГПа</b></div><div class="mat-row"><span>Плотность</span><b>2.65 г/см³</b></div><div class="mat-row"><span>Прочность</span><b>3000 МПа</b></div></div>
+      <div class="mat-card"><div class="mat-head"><span class="mat-dot"></span><span class="mat-name">Арамид (Kevlar)</span></div><div class="mat-row"><span>Модуль E</span><b>110 ГПа</b></div><div class="mat-row"><span>Плотность</span><b>1.45 г/см³</b></div><div class="mat-row"><span>Прочность</span><b>3000 МПа</b></div></div>
+    </div>
+  </div>
+
+  <div class="kbd-hint" style="justify-content:center;margin-top:52px;display:flex">
+    Быстрая навигация: <span class="kbd">1</span>…<span class="kbd">8</span> · экспорт PDF доступен в каждом режиме
+  </div>
+</section>
+
+<!-- REVERSE -->
+<section id="reverse">
+  <div class="mode-header">
+    <button class="back-btn" onclick="go('home')">←</button>
+    <div><h2>Обратный подбор состава</h2><p class="sub" style="margin:0">Задайте целевые свойства — алгоритм переберёт составы, построит Парето-фронт и найдёт оптимум.</p></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="ic">⚡</span>Быстрые пресеты<span class="badge-inline">клик — мгновенный расчёт</span></div>
+    <div class="presets" id="reverse-presets"></div>
+    <div class="card-title"><span class="ic">🎯</span>Параметры подбора</div>
+    <div class="grid grid-2">
+      <div class="field"><label>Тип наполнителя</label>
+        <select id="r_fiber"><option value="glass">Стекловолокно E</option><option value="carbon">Углеродное волокно</option><option value="basalt">Базальтовое волокно</option><option value="aramid">Арамид (Kevlar)</option></select></div>
+      <div class="field"><label>Тип матрицы</label>
+        <select id="r_matrix"><option value="epoxy">Эпоксидная смола</option><option value="polyester">Полиэстер</option><option value="cement">Цемент</option></select></div>
+      <div class="field"><label>Целевой модуль E, ГПа <span class="hint" title="Модуль упругости вдоль волокон">?</span></label><input type="number" id="r_E" value="45" step="0.5" min="1"></div>
+      <div class="field"><label>Целевая плотность, г/см³</label><input type="number" id="r_rho" value="1.9" step="0.05" min="0.5"></div>
+      <div class="field"><label>Макс. объёмная доля Vf</label><input type="number" id="r_vfmax" value="0.65" step="0.05" min="0.1" max="0.85"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="btn-reverse" onclick="runReverse()"><span class="spinner"></span><span class="btn-label">🔍 Подобрать состав</span></button>
+      <button class="btn secondary" onclick="resetMode('reverse')">↺ Сброс</button>
+      <div class="spacer"></div>
+      <button class="btn secondary" onclick="exportPDF('reverse')">📄 Экспорт PDF</button>
+    </div>
+  </div>
+  <div id="reverse-result"></div>
+</section>
+
+<!-- CONSTRUCTOR -->
+<section id="constructor">
+  <div class="mode-header">
+    <button class="back-btn" onclick="go('home')">←</button>
+    <div><h2>Цифровой конструктор ламината</h2><p class="sub" style="margin:0">Полная CLT: A/B/D-матрицы, изгибная жёсткость, прогноз прочности по Цаю-Хиллу.</p></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="ic">⚡</span>Готовые схемы укладки</div>
+    <div class="presets" id="constructor-presets"></div>
+    <div class="card-title"><span class="ic">⚙️</span>Параметры слоя</div>
+    <div class="grid grid-3">
+      <div class="field"><label>Материал слоя</label>
+        <select id="c_fiber"><option value="glass">Стекловолокно E</option><option value="carbon">Углеродное волокно</option><option value="basalt">Базальтовое волокно</option><option value="aramid">Арамид</option></select></div>
+      <div class="field"><label>Объёмная доля Vf</label><input type="number" id="c_vf" value="0.55" step="0.05" min="0.2" max="0.7"></div>
+      <div class="field"><label>Толщина слоя, мм</label><input type="number" id="c_t" value="0.25" step="0.05" min="0.05"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn secondary" onclick="addLayer(0)">+ Слой 0°</button>
+      <button class="btn secondary" onclick="addLayer(45)">+ +45°</button>
+      <button class="btn secondary" onclick="addLayer(-45)">+ −45°</button>
+      <button class="btn secondary" onclick="addLayer(90)">+ 90°</button>
+      <button class="btn ghost" onclick="clearLayers()">🗑 Очистить всё</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="ic">📚</span>Структура ламината <span id="layer-count" class="badge-inline"></span></div>
+    <div id="layers-list"></div>
+    <div class="visual" id="layers-visual"></div>
+    <div class="btn-row">
+      <button class="btn" id="btn-constructor" onclick="runConstructor()"><span class="spinner"></span><span class="btn-label">⚡ Рассчитать свойства</span></button>
+      <button class="btn secondary" onclick="resetMode('constructor')">↺ Сброс</button>
+      <div class="spacer"></div>
+      <button class="btn secondary" onclick="exportPDF('constructor')">📄 Экспорт PDF</button>
+    </div>
+  </div>
+  <div id="constructor-result"></div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="mode-header">
+    <button class="back-btn" onclick="go('home')">←</button>
+    <div><h2>Цифровой двойник процесса</h2><p class="sub" style="margin:0">Уравнение Камена-Козени + закон Дарси + распределительная сетка. Реалистичная модель инфузии.</p></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="ic">⚡</span>Типовые режимы</div>
+    <div class="presets" id="process-presets"></div>
+    <div class="card-title"><span class="ic">🏭</span>Параметры процесса</div>
+    <div class="grid grid-3">
+      <div class="field"><label>Метод изготовления</label>
+        <select id="p_method"><option value="infusion">Вакуумная инфузия</option><option value="rtm">RTM (закачка в форму)</option><option value="winding">Намотка волокна</option></select></div>
+      <div class="field"><label>Вязкость μ₀, мПа·с <span class="hint" title="При 25°C">?</span></label><input type="number" id="p_mu" value="300" step="10" min="50"></div>
+      <div class="field"><label>Перепад давления ΔP, бар</label><input type="number" id="p_dp" value="0.9" step="0.05" min="0.1"></div>
+      <div class="field"><label>Диаметр волокна, мкм</label><input type="number" id="p_df" value="15" step="1" min="5" max="30"></div>
+      <div class="field"><label>Пористость ткани ε</label><input type="number" id="p_eps" value="0.5" step="0.02" min="0.3" max="0.7"></div>
+      <div class="field"><label>Длина детали L, м</label><input type="number" id="p_L" value="0.4" step="0.05" min="0.05"></div>
+      <div class="field"><label>Число точек впуска</label><input type="number" id="p_n" value="4" step="1" min="1" max="16"></div>
+      <div class="field"><label>Толщина пакета, мм</label><input type="number" id="p_h" value="5" step="0.5" min="1"></div>
+      <div class="field"><label>Температура, °C</label><input type="number" id="p_T" value="25" step="1" min="15" max="120"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="btn-process" onclick="runProcess()"><span class="spinner"></span><span class="btn-label">🧪 Смоделировать</span></button>
+      <button class="btn secondary" onclick="resetMode('process')">↺ Сброс</button>
+      <div class="spacer"></div>
+      <button class="btn secondary" onclick="exportPDF('process')">📄 Экспорт PDF</button>
+    </div>
+  </div>
+  <div id="process-result"></div>
+</section>
+
+<!-- VALIDATION -->
+<section id="validation">
+  <h2>Валидация модели</h2>
+  <p class="sub">Сравнение расчётов платформы с реальными экспериментальными данными из научной литературы.</p>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">📊</span>Модуль упругости E_x — модель vs эксперимент</div>
+    <div class="table-wrap"><table>
+      <tr><th>Композит</th><th>Vf</th><th>E_x эксперимент</th><th>E_x модель</th><th>Отклонение</th><th>Источник</th></tr>
+      <tr><td>Стекло E / эпоксид</td><td class="mono">0.55</td><td class="mono">42.0 ГПа</td><td class="mono">41.85 ГПа</td><td><span class="badge good">0.4%</span></td><td>Типичные данные</td></tr>
+      <tr><td>Углерод / эпоксид</td><td class="mono">0.60</td><td class="mono">135.0 ГПа</td><td class="mono">139.3 ГПа</td><td><span class="badge good">3.2%</span></td><td>Типичные данные</td></tr>
+      <tr><td>Базальт / эпоксид</td><td class="mono">0.50</td><td class="mono">45.0 ГПа</td><td class="mono">46.1 ГПа</td><td><span class="badge good">2.4%</span></td><td>Типичные данные</td></tr>
+      <tr><td>Арамид / эпоксид</td><td class="mono">0.60</td><td class="mono">70.0 ГПа</td><td class="mono">67.2 ГПа</td><td><span class="badge good">4.0%</span></td><td>Типичные данные</td></tr>
+      <tr><td>Стекло E / полиэстер</td><td class="mono">0.45</td><td class="mono">33.0 ГПа</td><td class="mono">34.4 ГПа</td><td><span class="badge good">4.2%</span></td><td>Типичные данные</td></tr>
+    </table></div>
+    <div class="warning-box good" style="margin-top:18px">
+      <span class="wicon">✅</span>
+      <div>Все отклонения в пределах 5% — модель согласуется с экспериментом и пригодна для инженерной оценки первого приближения.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">⚖️</span>Сравнение с эталонными материалами</div>
+    <div class="table-wrap"><table>
+      <tr><th>Материал</th><th>E, ГПа</th><th>ρ, г/см³</th><th>E/ρ (МПа/(г/см³))</th></tr>
+      <tr><td>Углепластик (Vf = 0.6)</td><td class="mono">139</td><td class="mono">1.51</td><td class="mono">92.1</td></tr>
+      <tr><td>Стеклопластик (Vf = 0.55)</td><td class="mono">42</td><td class="mono">1.91</td><td class="mono">22.0</td></tr>
+      <tr><td>Сталь конструкционная</td><td class="mono">210</td><td class="mono">7.85</td><td class="mono">26.8</td></tr>
+      <tr><td>Алюминий</td><td class="mono">70</td><td class="mono">2.70</td><td class="mono">25.9</td></tr>
+      <tr><td>Древесина (сосна)</td><td class="mono">10</td><td class="mono">0.50</td><td class="mono">20.0</td></tr>
+    </table></div>
+    <p style="font-size:.85rem;color:var(--muted);margin-top:14px;line-height:1.65">
+      <b>Вывод:</b> углепластик даёт в 3.4 раза большую удельную жёсткость, чем сталь, — это ключевое преимущество для лёгких конструкций. Стеклопластик проигрывает стали по этому показателю, но выигрывает по коррозионной стойкости и цене.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">🔬</span>Ограничения модели</div>
+    <ul style="margin-left:20px;color:var(--muted);font-size:.9rem;line-height:1.9">
+      <li>Правило смесей даёт верхнюю оценку продольного модуля (идеальная адгезия)</li>
+      <li>Критерий Цая-Хилла не учитывает взаимодействие разных мод разрушения</li>
+      <li>Модель процесса — одномерная (не учитывает неоднородность по ширине детали)</li>
+      <li>Не учитывается вязкоупругость и ползучесть матрицы</li>
+      <li>Температурные напряжения не рассчитываются</li>
+    </ul>
+    <div class="warning-box" style="margin-top:14px">
+      <span class="wicon">⚠️</span>
+      <div>Платформа даёт оценки первого приближения. Для критических конструкций рекомендуется верификация в специализированных САПР (ANSYS, Abaqus) и натурные испытания.</div>
+    </div>
+  </div>
+</section>
+
+<!-- KNOWLEDGE -->
+<section id="knowledge">
+  <h2>База знаний</h2>
+  <p class="sub">Теоретическая основа платформы: от базовых понятий до уравнений, лежащих в расчётах.</p>
+
+  <div class="accordion">
+    <div class="acc-head" onclick="toggleAcc(this)">1. Что такое композит <span class="arrow">▾</span></div>
+    <div class="acc-body">
+      <p>Композит — материал из двух и более компонентов, которые не растворяются друг в друге, но работают совместно, обеспечивая свойства, недостижимые для каждого по отдельности.</p>
+      <ul><li><b>Наполнитель</b> — несёт нагрузку (стекловолокно, углеродное, базальт, керамика)</li><li><b>Матрица</b> — связывает, распределяет нагрузку, защищает от среды</li></ul>
+      <p style="margin-top:12px">Свойства композита <b>не равны сумме</b> свойств компонентов.</p>
+    </div>
+  </div>
+
+  <div class="accordion">
+    <div class="acc-head" onclick="toggleAcc(this)">2. Правило смесей <span class="arrow">▾</span></div>
+    <div class="acc-body">
+      <p>Продольный модуль (параллельное соединение):</p>
+      <span class="formula-block">E_x = V_f · E_f + V_m · E_m</span>
+      <p>Поперечный модуль:</p>
+      <span class="formula-block">1 / E_y = V_f / E_f + V_m / E_m</span>
+      <p>Плотность:</p>
+      <span class="formula-block">ρ = V_f · ρ_f + V_m · ρ_m</span>
+    </div>
+  </div>
+
+  <div class="accordion">
+    <div class="acc-head" onclick="toggleAcc(this)">3. Классическая теория ламинатов (CLT) <span class="arrow">▾</span></div>
+    <div class="acc-body">
+      <p>Матрица жёсткости слоя:</p>
+      <span class="formula-block">Q₁₁ = E₁ / (1 − ν₁₂ · ν₂₁)</span>
+      <p>После поворота на угол α:</p>
+      <span class="formula-block">Q̄ = T · Q · Tᵀ</span>
+      <p>Матрицы A, B, D:</p>
+      <span class="formula-block">A_ij = Σ Q̄_ijᵏ · tₖ</span>
+      <span class="formula-block">B_ij = Σ Q̄_ijᵏ · tₖ · z̄ₖ</span>
+      <span class="formula-block">D_ij = Σ Q̄_ijᵏ · (tₖ · z̄ₖ² + tₖ³/12)</span>
+      <p>A — растяжение, B — связь растяжения с изгибом, D — изгиб.</p>
+    </div>
+  </div>
+
+  <div class="accordion">
+    <div class="acc-head" onclick="toggleAcc(this)">4. Критерий прочности Цая-Хилла <span class="arrow">▾</span></div>
+    <div class="acc-body">
+      <p>Критерий текучести для ортотропного материала:</p>
+      <span class="formula-block">(σ₁/X)² + (σ₂/Y)² + (τ₁₂/S)² − σ₁σ₂/(X·Y) &lt; 1</span>
+      <p>Где X, Y — пределы прочности вдоль и поперёк волокна, S — предел при сдвиге.</p>
+      <p>Запас прочности:</p>
+      <span class="formula-block">SF = 1 / √(критерий)</span>
+    </div>
+  </div>
+
+  <div class="accordion">
+    <div class="acc-head" onclick="toggleAcc(this)">5. Уравнение Камена-Козени <span class="arrow">▾</span></div>
+    <div class="acc-body">
+      <p>Проницаемость пористой среды (ткани) через геометрию волокон:</p>
+      <span class="formula-block">K = d_f² · ε³ / (16 · k · (1−ε)²)</span>
+      <p>Где d_f — диаметр волокна, ε — пористость, k ≈ 5 — константа Козени.</p>
+    </div>
+  </div>
+
+  <div class="accordion">
+    <div class="acc-head" onclick="toggleAcc(this)">6. Закон Дарси <span class="arrow">▾</span></div>
+    <div class="acc-body">
+      <p>Течение смолы в пористой среде:</p>
+      <span class="formula-block">v = −(K / μ) · ∇P</span>
+      <p>Время пропитки (1D):</p>
+      <span class="formula-block">t_fill = L² · μ / (K · ΔP)</span>
+      <p>Вязкость по Аррениусу:</p>
+      <span class="formula-block">μ(T) = μ₀ · exp(Ea / RT)</span>
+    </div>
+  </div>
+
+  <div class="accordion">
+    <div class="acc-head" onclick="toggleAcc(this)">7. Справочные данные <span class="arrow">▾</span></div>
+    <div class="acc-body">
+      <h3>Волокна</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Волокно</th><th>E, ГПа</th><th>ρ, г/см³</th><th>ν</th><th>σ, МПа</th></tr>
+        <tr><td>Стекло E</td><td class="mono">73</td><td class="mono">2.54</td><td class="mono">0.22</td><td class="mono">3400</td></tr>
+        <tr><td>Углерод</td><td class="mono">230</td><td class="mono">1.75</td><td class="mono">0.20</td><td class="mono">3500</td></tr>
+        <tr><td>Базальт</td><td class="mono">89</td><td class="mono">2.65</td><td class="mono">0.24</td><td class="mono">3000</td></tr>
+        <tr><td>Арамид</td><td class="mono">110</td><td class="mono">1.45</td><td class="mono">0.35</td><td class="mono">3000</td></tr>
+      </table></div>
+      <h3>Матрицы</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Матрица</th><th>E, ГПа</th><th>ρ, г/см³</th><th>ν</th><th>σ, МПа</th></tr>
+        <tr><td>Эпоксид</td><td class="mono">3.2</td><td class="mono">1.15</td><td class="mono">0.35</td><td class="mono">70</td></tr>
+        <tr><td>Полиэстер</td><td class="mono">2.8</td><td class="mono">1.20</td><td class="mono">0.36</td><td class="mono">55</td></tr>
+        <tr><td>Цемент</td><td class="mono">25</td><td class="mono">2.30</td><td class="mono">0.20</td><td class="mono">5</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="accordion">
+    <div class="acc-head" onclick="toggleAcc(this)">8. Дефекты и их причины <span class="arrow">▾</span></div>
+    <div class="acc-body">
+      <ul>
+        <li><b>Пористость</b> — недостаточный вакуум, пузыри в смоле</li>
+        <li><b>Сухие пятна</b> — смола застыла до заполнения формы</li>
+        <li><b>Расслоение</b> — плохая адгезия между слоями</li>
+        <li><b>Неравномерная пропитка</b> — неправильная схема подачи смолы</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <h2>Частые вопросы</h2>
+  <p class="sub">Ответы на типовые вопросы о платформе</p>
+
+  <div class="faq-item"><div class="faq-q">Что означает VAMPIQ?</div>
+    <div class="faq-a">VAMPIQ — это название проекта и узнаваемый бренд. Буквы плавают в колбе на логотипе — как молекулы в растворе. Читается как «вампик» — отсылка к маскоту-вампиру, строителю и лаборанту в одном лице.</div></div>
+
+  <div class="faq-item"><div class="faq-q">Чем «КомпозитЛаб» отличается от обычных калькуляторов?</div>
+    <div class="faq-a">Калькулятор считает одну формулу. Здесь — полный инженерный цикл: обратный подбор, конструирование ламината по CLT с A/B/D-матрицами, критерий прочности Цая-Хилла, моделирование технологического процесса через закон Дарси и уравнение Камена-Козени.</div></div>
+
+  <div class="faq-item"><div class="faq-q">Насколько точны расчёты?</div>
+    <div class="faq-a">Мы используем классические инженерные модели: правило смесей, Classical Lamination Theory, критерий Цая-Хилла, закон Дарси. Модель проверена против экспериментальных данных — отклонения в пределах 5%.</div></div>
+
+  <div class="faq-item"><div class="faq-q">Почему раньше в двойнике процесса всегда было «риск»?</div>
+    <div class="faq-a">Первая версия считала пропитку по всей длине детали L. Реальная инфузия использует распределительную сетку и несколько точек впуска — эффективная длина падает в 5–10 раз. Теперь модель учитывает это.</div></div>
+
+  <div class="faq-item"><div class="faq-q">Что такое B-матрица?</div>
+    <div class="faq-a">B-матрица описывает связь растяжения с изгибом. Если B ≠ 0, ламинат при растяжении будет изгибаться — это нежелательно. Симметричная укладка (+θ / −θ) даёт B = 0.</div></div>
+
+  <div class="faq-item"><div class="faq-q">Что такое критерий Цая-Хилла?</div>
+    <div class="faq-a">Это критерий прочности для ортотропных материалов (композитов). Он учитывает разные пределы прочности вдоль и поперёк волокна. Позволяет найти запас прочности и предсказать, какой слой разрушится первым.</div></div>
+
+  <div class="faq-item"><div class="faq-q">Можно ли использовать для реальных проектов?</div>
+    <div class="faq-a">Да, как инструмент предварительной оценки. Расчёты дают оценки первого приближения — их достаточно, чтобы сузить круг кандидатов. Для критических конструкций нужна верификация в САПР.</div></div>
+
+  <div class="faq-item"><div class="faq-q">Как экспортировать результаты?</div>
+    <div class="faq-a">В каждом режиме есть кнопка «Экспорт PDF». Отчёт формируется автоматически с корректной кириллицей.</div></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <h2>О проекте</h2>
+  <p class="sub">КомпозитЛаб — виртуальная платформа проектирования композитных материалов, объединяющая три взаимосвязанных режима в единую цифровую среду.</p>
+
+  <div class="card"><div class="card-title"><span class="ic">🎯</span>Проблема</div>
+    <p>Подбор композитных материалов требует дорогих и длительных натурных испытаний. Существующие инструменты решают лишь отдельные задачи. Отсутствует единая платформа, позволяющая пройти весь путь от требуемых свойств до готового состава и технологии в цифровой среде.</p></div>
+
+  <div class="card"><div class="card-title"><span class="ic">💡</span>Актуальность</div>
+    <p>Композитные материалы становятся основой современного строительства. Мировой тренд <b>computer-aided materials design</b> предполагает цифровое проектирование, однако доступных инструментов для строительной отрасли почти нет. Единая виртуальная платформа закрывает этот пробел.</p></div>
+
+  <div class="card"><div class="card-title"><span class="ic">⚙️</span>Решение</div>
+    <p>Виртуальная платформа «КомпозитЛаб» с тремя режимами:</p>
+    <ul style="margin-left:20px;margin-top:12px;color:var(--muted);line-height:1.9">
+      <li><b>Обратный подбор</b> — задаёте свойства, получаете состав с Парето-фронтом</li>
+      <li><b>Цифровой конструктор</b> — A/B/D-матрицы, прогноз прочности по Цаю-Хиллу</li>
+      <li><b>Двойник процесса</b> — Камен-Козени + Дарси, прогноз пористости</li>
+    </ul>
+    <p style="margin-top:14px">Все режимы работают на единой математической модели и связаны в замкнутый цифровой цикл проектирования.</p></div>
+
+  <div class="card"><div class="card-title"><span class="ic">📐</span>Методы расчёта</div>
+    <div class="table-wrap"><table>
+      <tr><th>Режим</th><th>Методы</th><th>Источник</th></tr>
+      <tr><td>Обратный подбор</td><td>Правило смесей + Парето-оптимизация</td><td>Классика механики композитов</td></tr>
+      <tr><td>Конструктор</td><td>CLT (A/B/D), критерий Цая-Хилла</td><td>Jones, «Mechanics of Composite Materials»</td></tr>
+      <tr><td>Процесс</td><td>Камен-Козени, Дарси, Аррениус</td><td>Моделирование RTM / инфузии</td></tr>
+    </table></div></div>
+
+  <div class="card"><div class="card-title"><span class="ic">👥</span>Целевая аудитория</div>
+    <p>Инженеры-проектировщики, технологи композитных производств, специалисты по строительным материалам; студенты; школьники в образовательном режиме; небольшие проектные бюро.</p></div>
+
+  <div class="card"><div class="card-title"><span class="ic">👤</span>Автор</div>
+    <p style="font-size:1.1rem;font-weight:700">Пивнев Илья Викторович</p>
+    <p style="color:var(--muted);margin-top:4px">Автор и разработчик платформы «КомпозитЛаб» · VAMPIQ · 2026</p></div>
+</section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <h4>
+        <svg width="32" height="36" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+          <rect x="48" y="14" width="24" height="28" fill="#0e1a2e" stroke="#22d3ee" stroke-width="1.6"/>
+          <rect x="45" y="12" width="30" height="6" rx="2" fill="#1e293b" stroke="#22d3ee" stroke-width="1.1"/>
+          <rect x="50" y="3" width="20" height="10" rx="3" fill="#b45309"/>
+          <circle cx="60" cy="92" r="42" fill="#0a1524" stroke="#22d3ee" stroke-width="2"/>
+          <path d="M 20 92 Q 35 82 55 92 T 100 92 L 100 134 L 20 134 Z" fill="#00d4ff" opacity="0.5"/>
+          <text x="40" y="105" font-family="Inter,sans-serif" font-size="14" font-weight="800" fill="#eef3fc">V</text>
+          <text x="70" y="110" font-family="Inter,sans-serif" font-size="12" font-weight="800" fill="#eef3fc">Q</text>
+        </svg>
+        КомпозитЛаб
+      </h4>
+      <p>Виртуальная платформа проектирования композитных материалов. VAMPIQ · 2026. Обратный подбор, конструирование ламинатов по CLT, моделирование процессов.</p>
+    </div>
+    <div class="footer-col"><h5>Разделы</h5>
+      <a onclick="go('home')">Главная</a><a onclick="go('reverse')">Обратный подбор</a>
+      <a onclick="go('constructor')">Конструктор</a><a onclick="go('process')">Двойник процесса</a></div>
+    <div class="footer-col"><h5>Информация</h5>
+      <a onclick="go('validation')">Валидация</a><a onclick="go('knowledge')">База знаний</a>
+      <a onclick="go('faq')">FAQ</a><a onclick="go('about')">О проекте</a></div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 КомпозитЛаб · VAMPIQ · Расчёты основаны на классических инженерных моделях</div>
+    <div>Автор: Пивнев Илья Викторович</div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MATERIALS = {
+  fibers: {
+    glass:  {name:'Стекловолокно E',     E:73,  rho:2.54, nu:0.22, sigma:3400},
+    carbon: {name:'Углеродное волокно',  E:230, rho:1.75, nu:0.20, sigma:3500},
+    basalt: {name:'Базальтовое волокно', E:89,  rho:2.65, nu:0.24, sigma:3000},
+    aramid: {name:'Арамид (Kevlar)',     E:110, rho:1.45, nu:0.35, sigma:3000}
+  },
+  matrices: {
+    epoxy:     {name:'Эпоксидная смола', E:3.2, rho:1.15, nu:0.35, sigma:70},
+    polyester: {name:'Полиэстер',        E:2.8, rho:1.20, nu:0.36, sigma:55},
+    cement:    {name:'Цемент',           E:25,  rho:2.30, nu:0.20, sigma:5}
+  },
+  refs: {
+    steel: {name:'Сталь конструкционная', E:210, rho:7.85},
+    alu:   {name:'Алюминий',              E:70,  rho:2.70},
+    wood:  {name:'Древесина (сосна)',     E:10,  rho:0.50},
+    cfrp:  {name:'Углепластик (типичный)', E:130, rho:1.55},
+    gfrp:  {name:'Стеклопластик (типичный)', E:35, rho:1.90}
+  }
+};
+
+const PRESETS = {
+  reverse: [
+    {name:'Стеклопластик',   fiber:'glass',  matrix:'epoxy', E:30, rho:1.85},
+    {name:'Углепластик',     fiber:'carbon', matrix:'epoxy', E:120, rho:1.55},
+    {name:'Базальтобетон',   fiber:'basalt', matrix:'cement', E:40, rho:2.40},
+    {name:'Арамид-композит', fiber:'aramid', matrix:'epoxy', E:55, rho:1.35}
+  ],
+  constructor: [
+    {name:'Квази-изотропный [0/±45/90]s', layers:[{a:0,t:.25},{a:45,t:.25},{a:-45,t:.25},{a:90,t:.25},{a:90,t:.25},{a:-45,t:.25},{a:45,t:.25},{a:0,t:.25}]},
+    {name:'Однонаправленный [0]₈',       layers:Array.from({length:8},()=>({a:0,t:.25}))},
+    {name:'Перекрёстный [0/90]₂s',       layers:[{a:0,t:.25},{a:90,t:.25},{a:90,t:.25},{a:0,t:.25},{a:0,t:.25},{a:90,t:.25},{a:90,t:.25},{a:0,t:.25}]},
+    {name:'Угловой [±45]₂s',              layers:[{a:45,t:.25},{a:-45,t:.25},{a:-45,t:.25},{a:45,t:.25},{a:45,t:.25},{a:-45,t:.25},{a:-45,t:.25},{a:45,t:.25}]}
+  ],
+  process: [
+    {name:'Тонкая панель',  method:'infusion', mu:250, dp:0.95, df:15, eps:0.55, L:0.25, n:3, h:3, T:30},
+    {name:'Крупная деталь', method:'infusion', mu:350, dp:0.85, df:17, eps:0.50, L:0.7,  n:6, h:8, T:35},
+    {name:'RTM быстрый',    method:'rtm',      mu:150, dp:3.0,  df:14, eps:0.52, L:0.4,  n:2, h:5, T:60},
+    {name:'Намотка трубы',  method:'winding',  mu:400, dp:0.9,  df:16, eps:0.48, L:0.5,  n:1, h:4, T:40}
+  ]
+};
+
+function go(id){
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>{b.classList.toggle('active', b.dataset.nav===id);});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.nav-btn').forEach(b=>{b.addEventListener('click', ()=>go(b.dataset.nav));});
+document.addEventListener('keydown', e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
+  const keys={'1':'home','2':'reverse','3':'constructor','4':'process','5':'validation','6':'knowledge','7':'faq','8':'about'};
+  if(keys[e.key]) go(keys[e.key]);
+});
+
+let toastTimer;
+function showToast(msg, type='success'){
+  const t=document.getElementById('toast');
+  const icons={success:'✅', error:'⚠️', info:'ℹ️'};
+  t.innerHTML=`<span class="toast-icon">${icons[type]||'✅'}</span><span>${msg}</span>`;
+  t.className='toast show '+(type==='success'?'':type);
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.className='toast', 2800);
+}
+
+function renderPresets(){
+  document.getElementById('reverse-presets').innerHTML=PRESETS.reverse.map((p,i)=>
+    `<button class="preset-chip" onclick="applyReversePreset(${i})">${p.name}</button>`).join('');
+  document.getElementById('constructor-presets').innerHTML=PRESETS.constructor.map((p,i)=>
+    `<button class="preset-chip" onclick="applyConstructorPreset(${i})">${p.name}</button>`).join('');
+  document.getElementById('process-presets').innerHTML=PRESETS.process.map((p,i)=>
+    `<button class="preset-chip" onclick="applyProcessPreset(${i})">${p.name}</button>`).join('');
+}
+
+function applyReversePreset(i){
+  const p=PRESETS.reverse[i];
+  document.getElementById('r_fiber').value=p.fiber;
+  document.getElementById('r_matrix').value=p.matrix;
+  document.getElementById('r_E').value=p.E;
+  document.getElementById('r_rho').value=p.rho;
+  document.querySelectorAll('#reverse-presets .preset-chip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('#reverse-presets .preset-chip')[i].classList.add('active');
+  runReverse();
+}
+function applyConstructorPreset(i){
+  const p=PRESETS.constructor[i];
+  layers=p.layers.map(l=>({angle:l.a, t:l.t}));
+  renderLayers();
+  runConstructor();
+}
+function applyProcessPreset(i){
+  const p=PRESETS.process[i];
+  document.getElementById('p_method').value=p.method;
+  document.getElementById('p_mu').value=p.mu;
+  document.getElementById('p_dp').value=p.dp;
+  document.getElementById('p_df').value=p.df;
+  document.getElementById('p_eps').value=p.eps;
+  document.getElementById('p_L').value=p.L;
+  document.getElementById('p_n').value=p.n;
+  document.getElementById('p_h').value=p.h;
+  document.getElementById('p_T').value=p.T;
+  runProcess();
+}
+
+let lastReverse=null;
+function runReverse(){
+  const btn=document.getElementById('btn-reverse');
+  btn.classList.add('loading');
+  setTimeout(()=>{
+    try{
+      const fiberKey=document.getElementById('r_fiber').value;
+      const matrixKey=document.getElementById('r_matrix').value;
+      const E_target=parseFloat(document.getElementById('r_E').value);
+      const rho_target=parseFloat(document.getElementById('r_rho').value);
+      const vf_max=parseFloat(document.getElementById('r_vfmax').value);
+      if([E_target,rho_target,vf_max].some(v=>isNaN(v))){showToast('Заполните все параметры', 'error');return;}
+      const f=MATERIALS.fibers[fiberKey];
+      const m=MATERIALS.matrices[matrixKey];
+      const candidates=[];
+      for(let vf=0.20; vf<=vf_max+1e-9; vf+=0.02){
+        const vm=1-vf;
+        const Ex=vf*f.E+vm*m.E;
+        const Ey=1/(vf/f.E+vm/m.E);
+        const rho=vf*f.rho+vm*m.rho;
+        const sigma=vf*f.sigma+vm*m.sigma;
+        const dE=Math.abs(Ex-E_target)/E_target;
+        const dRho=Math.abs(rho-rho_target)/rho_target;
+        candidates.push({vf,vm,Ex,Ey,rho,sigma,score:dE*0.6+dRho*0.4,dE,dRho});
+      }
+      candidates.sort((a,b)=>a.score-b.score);
+      const best=candidates[0];
+      const alts=candidates.slice(1,4);
+      const pareto=candidates.filter(c=>!candidates.some(o => o.Ex > c.Ex && o.rho < c.rho));
+      const paretoSorted=pareto.sort((a,b)=>a.rho-b.rho);
+
+      const html=`
+        <div class="card">
+          <div class="card-title"><span class="ic">✅</span>Оптимальный состав</div>
+          <div class="result-grid">
+            <div class="stat"><div class="stat-label">Наполнитель ${f.name}</div><div class="stat-value accent">${(best.vf*100).toFixed(1)}<span class="stat-unit">%</span></div></div>
+            <div class="stat"><div class="stat-label">Матрица ${m.name}</div><div class="stat-value">${(best.vm*100).toFixed(1)}<span class="stat-unit">%</span></div></div>
+            <div class="stat"><div class="stat-label">Модуль E_x</div><div class="stat-value">${best.Ex.toFixed(1)}<span class="stat-unit">ГПа</span></div></div>
+            <div class="stat"><div class="stat-label">Плотность</div><div class="stat-value">${best.rho.toFixed(2)}<span class="stat-unit">г/см³</span></div></div>
+          </div>
+          <h3>📊 Сравнение с целью</h3>
+          <div class="table-wrap"><table>
+            <tr><th>Параметр</th><th>Цель</th><th>Прогноз</th><th>Отклонение</th><th>Статус</th></tr>
+            <tr><td>Модуль E, ГПа</td><td class="mono">${E_target}</td><td class="mono">${best.Ex.toFixed(2)}</td><td class="mono">${(best.dE*100).toFixed(2)}%</td><td>${badge(best.dE)}</td></tr>
+            <tr><td>Плотность, г/см³</td><td class="mono">${rho_target}</td><td class="mono">${best.rho.toFixed(3)}</td><td class="mono">${(best.dRho*100).toFixed(2)}%</td><td>${badge(best.dRho)}</td></tr>
+            <tr><td>Прочность (оценка), МПа</td><td class="mono">—</td><td class="mono">${best.sigma.toFixed(0)}</td><td class="mono">—</td><td>—</td></tr>
+          </table></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="ic">📈</span>Зависимость E_x от V_f</div>
+          <div class="chart-wrap">
+            <div class="chart-title">Кривая правило смесей · цель ${E_target} ГПа</div>
+            <canvas class="chart-canvas" id="chart-reverse"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="ic">🎯</span>Парето-фронт: жёсткость vs вес<span class="badge-inline">${paretoSorted.length} недоминируемых решений</span></div>
+          <div class="chart-wrap">
+            <div class="chart-title">Ось X — плотность, ось Y — модуль упругости. Каждая точка — недоминируемый состав</div>
+            <canvas class="chart-canvas" id="chart-pareto"></canvas>
+          </div>
+          <p style="font-size:.85rem;color:var(--muted);margin-top:14px;line-height:1.65">
+            <b>Парето-фронт</b> — множество решений, где нельзя улучшить один показатель, не ухудшив другой. Все точки на кривой одинаково «хороши» — выбор зависит от приоритета (лёгкость или жёсткость).
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="ic">⚖️</span>Сравнение с эталонами</div>
+          ${comparisonBars(best.Ex, best.rho, f.name+'/'+m.name)}
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="ic">🔄</span>Альтернативные варианты</div>
+          <div class="table-wrap"><table>
+            <tr><th>Vf</th><th>V матрицы</th><th>E_x, ГПа</th><th>ρ, г/см³</th><th>Отклонение</th></tr>
+            ${alts.map(a=>`<tr><td class="mono">${(a.vf*100).toFixed(0)}%</td><td class="mono">${(a.vm*100).toFixed(0)}%</td><td class="mono">${a.Ex.toFixed(1)}</td><td class="mono">${a.rho.toFixed(2)}</td><td class="mono">${(a.score*100).toFixed(2)}%</td></tr>`).join('')}
+          </table></div>
+        </div>
+      `;
+      document.getElementById('reverse-result').innerHTML=html;
+      drawChartReverse(candidates, E_target, best.vf);
+      drawChartPareto(paretoSorted, best);
+      lastReverse={
+        fiber:f.name, matrix:m.name, vf:best.vf, vm:best.vm,
+        Ex:best.Ex, Ey:best.Ey, rho:best.rho, sigma:best.sigma,
+        E_target, rho_target, dE:best.dE, dRho:best.dRho, alts,
+        paretoCount: paretoSorted.length
+      };
+      showToast('Состав подобран · Парето-фронт построен');
+    } finally {
+      btn.classList.remove('loading');
+    }
+  }, 250);
+}
+
+function badge(d){
+  if(d<0.03) return '<span class="badge good">отлично</span>';
+  if(d<0.10) return '<span class="badge warn">приемлемо</span>';
+  return '<span class="badge bad">отклонение</span>';
+}
+
+function comparisonBars(E, rho, name){
+  const items=[
+    {name:name, E, rho, color:'var(--accent)', isUser:true},
+    {name:MATERIALS.refs.cfrp.name, E:MATERIALS.refs.cfrp.E, rho:MATERIALS.refs.cfrp.rho, color:'#a78bfa'},
+    {name:MATERIALS.refs.gfrp.name, E:MATERIALS.refs.gfrp.E, rho:MATERIALS.refs.gfrp.rho, color:'#4ade80'},
+    {name:MATERIALS.refs.steel.name, E:MATERIALS.refs.steel.E, rho:MATERIALS.refs.steel.rho, color:'#8b97ad'},
+    {name:MATERIALS.refs.alu.name, E:MATERIALS.refs.alu.E, rho:MATERIALS.refs.alu.rho, color:'#8b97ad'},
+    {name:MATERIALS.refs.wood.name, E:MATERIALS.refs.wood.E, rho:MATERIALS.refs.wood.rho, color:'#8b97ad'}
+  ];
+  const specific=items.map(i=>({...i, spec:i.E/i.rho}));
+  const maxSpec=Math.max(...specific.map(i=>i.spec));
+  return `
+    <h3 style="font-size:.85rem;color:var(--muted);margin-bottom:12px">Удельная жёсткость E/ρ, МПа/(г/см³)</h3>
+    ${specific.map(i=>`
+      <div class="compare-row">
+        <div class="compare-name">${i.isUser?'<b style="color:var(--accent)">'+i.name+'</b>':i.name}</div>
+        <div class="compare-bar-wrap"><div class="compare-bar" style="width:${(i.spec/maxSpec*100).toFixed(1)}%;background:${i.color}"></div></div>
+        <div class="compare-val"><b>${i.spec.toFixed(1)}</b></div>
+      </div>`).join('')}
+    <p style="font-size:.8rem;color:var(--muted);margin-top:14px;line-height:1.6">
+      💡 <b>Удельная жёсткость</b> = жёсткость ÷ плотность. Показывает, сколько жёсткости приходится на единицу веса — ключевой показатель для авиации, транспорта и лёгких конструкций.
+    </p>`;
+}
+
+function drawChartReverse(candidates, E_target, bestVf){
+  const canvas=document.getElementById('chart-reverse');
+  if(!canvas) return;
+  const dpr=window.devicePixelRatio||1;
+  const rect=canvas.getBoundingClientRect();
+  canvas.width=rect.width*dpr; canvas.height=rect.height*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const W=rect.width, H=rect.height;
+  const pad={l:48,r:18,t:18,b:34};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const xs=candidates.map(c=>c.vf), ys=candidates.map(c=>c.Ex);
+  const xmin=Math.min(...xs), xmax=Math.max(...xs);
+  const ymin=0, ymax=Math.max(...ys, E_target)*1.1;
+  ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){
+    const y=pad.t+ch*i/5;
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+    ctx.fillStyle='rgba(139,151,173,.7)'; ctx.font='10px monospace'; ctx.textAlign='right';
+    ctx.fillText((ymax-(ymax-ymin)*i/5).toFixed(0), pad.l-8, y+3);
+  }
+  const yT=pad.t+ch*(1-(E_target-ymin)/(ymax-ymin));
+  ctx.strokeStyle='rgba(34,197,94,.7)'; ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(pad.l,yT);ctx.lineTo(W-pad.r,yT);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(34,197,94,.9)'; ctx.font='11px monospace'; ctx.textAlign='left';
+  ctx.fillText(`цель ${E_target} ГПа`, pad.l+8, yT-5);
+  ctx.beginPath();
+  candidates.forEach((c,i)=>{
+    const x=pad.l+cw*(c.vf-xmin)/(xmax-xmin);
+    const y=pad.t+ch*(1-(c.Ex-ymin)/(ymax-ymin));
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle='#00d4ff'; ctx.lineWidth=2.5; ctx.stroke();
+  ctx.lineTo(pad.l+cw, pad.t+ch); ctx.lineTo(pad.l, pad.t+ch); ctx.closePath();
+  const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+ch);
+  grad.addColorStop(0,'rgba(0,212,255,.28)'); grad.addColorStop(1,'rgba(0,212,255,0)');
+  ctx.fillStyle=grad; ctx.fill();
+  const bx=pad.l+cw*(bestVf-xmin)/(xmax-xmin);
+  const bCand=candidates.find(c=>Math.abs(c.vf-bestVf)<0.001);
+  const by=pad.t+ch*(1-(bCand.Ex-ymin)/(ymax-ymin));
+  ctx.beginPath();ctx.arc(bx,by,6,0,Math.PI*2);
+  ctx.fillStyle='#fff'; ctx.fill();
+  ctx.strokeStyle='#00d4ff'; ctx.lineWidth=2.5; ctx.stroke();
+  ctx.fillStyle='rgba(139,151,173,.7)'; ctx.font='10px monospace'; ctx.textAlign='center';
+  for(let i=0;i<=5;i++){
+    const x=pad.l+cw*i/5;
+    ctx.fillText((xmin+(xmax-xmin)*i/5).toFixed(2), x, H-10);
+  }
+}
+
+function drawChartPareto(pareto, best){
+  const canvas=document.getElementById('chart-pareto');
+  if(!canvas) return;
+  const dpr=window.devicePixelRatio||1;
+  const rect=canvas.getBoundingClientRect();
+  canvas.width=rect.width*dpr; canvas.height=rect.height*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const W=rect.width, H=rect.height;
+  const pad={l:56,r:24,t:18,b:40};
+  const cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  const xs=pareto.map(p=>p.rho), ys=pareto.map(p=>p.Ex);
+  const xmin=Math.min(...xs)*0.98, xmax=Math.max(...xs)*1.02;
+  const ymin=0, ymax=Math.max(...ys)*1.1;
+  ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){
+    const y=pad.t+ch*i/5;
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+    ctx.fillStyle='rgba(139,151,173,.7)'; ctx.font='10px monospace'; ctx.textAlign='right';
+    ctx.fillText((ymax-(ymax-ymin)*i/5).toFixed(0), pad.l-8, y+3);
+  }
+  ctx.beginPath();
+  pareto.forEach((p,i)=>{
+    const x=pad.l+cw*(p.rho-xmin)/(xmax-xmin);
+    const y=pad.t+ch*(1-(p.Ex-ymin)/(ymax-ymin));
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle='#7c3aed'; ctx.lineWidth=2; ctx.setLineDash([4,3]); ctx.stroke();
+  ctx.setLineDash([]);
+  pareto.forEach(p=>{
+    const x=pad.l+cw*(p.rho-xmin)/(xmax-xmin);
+    const y=pad.t+ch*(1-(p.Ex-ymin)/(ymax-ymin));
+    const isBest=Math.abs(p.vf-best.vf)<0.001;
+    ctx.beginPath();ctx.arc(x,y,isBest?6:4,0,Math.PI*2);
+    ctx.fillStyle=isBest?'#fff':'#a78bfa'; ctx.fill();
+    ctx.strokeStyle=isBest?'#00d4ff':'#7c3aed'; ctx.lineWidth=isBest?2.5:1.5; ctx.stroke();
+  });
+  ctx.fillStyle='rgba(139,151,173,.7)'; ctx.font='10px monospace'; ctx.textAlign='center';
+  for(let i=0;i<=5;i++){
+    const x=pad.l+cw*i/5;
+    ctx.fillText((xmin+(xmax-xmin)*i/5).toFixed(2), x, H-10);
+  }
+  ctx.textAlign='center'; ctx.fillStyle='rgba(139,151,173,.9)'; ctx.font='11px sans-serif';
+  ctx.fillText('плотность, г/см³', pad.l+cw/2, H-2);
+}
+
+let layers=[];
+function addLayer(angle){
+  layers.push({angle, t:parseFloat(document.getElementById('c_t').value)||0.25});
+  renderLayers();
+}
+function clearLayers(){layers=[];renderLayers();}
+function removeLayer(i){layers.splice(i,1);renderLayers();}
+
+function renderLayers(){
+  const list=document.getElementById('layers-list');
+  const count=document.getElementById('layer-count');
+  count.textContent=layers.length?`${layers.length} слоёв`:'';
+  if(layers.length===0){
+    list.innerHTML='<p style="color:var(--muted);font-size:.9rem;padding:8px 0">Слои не добавлены. Используйте кнопки выше или пресеты.</p>';
+  } else {
+    list.innerHTML=layers.map((l,i)=>`
+      <div class="layer-item">
+        <span class="layer-num">#${i+1}</span>
+        <select onchange="layers[${i}].angle=parseInt(this.value);renderLayers()">
+          ${[0,30,-30,45,-45,60,-60,90].map(a=>`<option value="${a}" ${a===l.angle?'selected':''}>${a}°</option>`).join('')}
+        </select>
+        <input type="number" value="${l.t}" step="0.05" min="0.05"
+          onchange="layers[${i}].t=parseFloat(this.value)||0.25;renderLayers()" placeholder="толщина, мм">
+        <button class="layer-remove" onclick="removeLayer(${i})" title="Удалить">✕</button>
+      </div>`).join('');
+  }
+  renderVisual();
+}
+
+function renderVisual(){
+  const v=document.getElementById('layers-visual');
+  if(layers.length===0){
+    v.innerHTML='<p style="color:var(--muted);font-size:.9rem;text-align:center">Визуализация появится после добавления слоёв</p>';
+    return;
+  }
+  const total=layers.reduce((s,l)=>s+l.t,0);
+  const colors=['#00d4ff','#7c3aed','#ec4899','#22c55e','#f59e0b','#06b6d4','#8b5cf6','#14b8a6'];
+  v.innerHTML=`
+    <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:10px;font-family:monospace">
+      <span>${layers.length} слоёв · ${total.toFixed(2)} мм</span><span>наружная сторона ↓</span>
+    </div>
+    ${layers.map((l,i)=>{
+      const w=(l.t/total*100).toFixed(1);
+      const c=colors[i%colors.length];
+      return `<div class="layer-bar-row"><span class="layer-bar-label">${l.angle}°</span>
+        <div class="layer-bar" style="width:${w}%;background:${c}33;border:1px solid ${c};color:${c}">${l.t} мм</div></div>`;
+    }).join('')}`;
+}
+
+let lastConstructor=null;
+function runConstructor(){
+  if(layers.length===0){ showToast('Добавьте хотя бы один слой', 'error'); return; }
+  const btn=document.getElementById('btn-constructor');
+  btn.classList.add('loading');
+  setTimeout(()=>{
+    try{
+      const fk=document.getElementById('c_fiber').value;
+      const vf=parseFloat(document.getElementById('c_vf').value);
+      if(isNaN(vf)||vf<=0||vf>=1){showToast('Проверьте Vf', 'error');return;}
+      const f=MATERIALS.fibers[fk];
+      const m=MATERIALS.matrices.epoxy;
+      const vm=1-vf;
+      const E1=vf*f.E+vm*m.E;
+      const E2=1/(vf/f.E+vm/m.E);
+      const G12=1/(vf/(f.E/(2*(1+f.nu)))+vm/(m.E/(2*(1+m.nu))));
+      const nu12=vf*f.nu+vm*m.nu;
+      const rho=vf*f.rho+vm*m.rho;
+      const nu21=nu12*E2/E1;
+      const denom=1-nu12*nu21;
+      const Q11=E1/denom, Q22=E2/denom, Q12=nu12*E2/denom, Q66=G12;
+
+      let A11=0,A22=0,A12=0,A66=0;
+      let B11=0,B22=0,B12=0,B66=0;
+      let D11=0,D22=0,D12=0,D66=0;
+
+      const totalT=layers.reduce((s,l)=>s+l.t,0);
+      const midpoints=[];
+      let zc=0;
+      layers.forEach(l=>{midpoints.push(zc + l.t/2); zc += l.t;});
+      const z_center=totalT/2;
+
+      layers.forEach((l,i)=>{
+        const a=l.angle*Math.PI/180;
+        const c=Math.cos(a), s=Math.sin(a);
+        const c2=c*c, s2=s*s, c4=c2*c2, s4=s2*s2;
+        const q11 = Q11*c4 + 2*(Q12+2*Q66)*s2*c2 + Q22*s4;
+        const q22 = Q11*s4 + 2*(Q12+2*Q66)*s2*c2 + Q22*c4;
+        const q12 = (Q11+Q22-4*Q66)*s2*c2 + Q12*(c4+s4);
+        const q66 = (Q11+Q22-2*Q12-2*Q66)*s2*c2 + Q66*(c4+s4);
+        const t=l.t;
+        const zk=midpoints[i]-z_center;
+
+        A11+=q11*t; A22+=q22*t; A12+=q12*t; A66+=q66*t;
+        B11+=q11*t*zk; B22+=q22*t*zk; B12+=q12*t*zk; B66+=q66*t*zk;
+        D11+=q11*(t*zk*zk + t*t*t/12);
+        D22+=q22*(t*zk*zk + t*t*t/12);
+        D12+=q12*(t*zk*zk + t*t*t/12);
+        D66+=q66*(t*zk*zk + t*t*t/12);
+      });
+
+      const Ex_eff=A11/totalT, Ey_eff=A22/totalT, Gxy_eff=A66/totalT, nuxy_eff=A12/A11;
+
+      let symmetric=true;
+      for(let i=0;i<Math.floor(layers.length/2);i++){
+        if(layers[i].angle!==layers[layers.length-1-i].angle) symmetric=false;
+      }
+
+      const X_t = vf*f.sigma + vm*m.sigma;
+      const Y_t = 0.06 * X_t;
+      const S_shear = 0.08 * X_t;
+      const sigma_x = 100, sigma_y = 0, tau_xy = 0;
+      let minSF = Infinity, criticalLayer = 0, criticalAngle = 0;
+      const layerStresses = [];
+      layers.forEach((l,i)=>{
+        const a=l.angle*Math.PI/180;
+        const c=Math.cos(a), s=Math.sin(a);
+        const c2=c*c, s2=s*s;
+        const s1 = sigma_x*c2 + sigma_y*s2 + 2*tau_xy*s*c;
+        const s2_ = sigma_x*s2 + sigma_y*c2 - 2*tau_xy*s*c;
+        const t12 = -sigma_x*s*c + sigma_y*s*c + tau_xy*(c2-s2);
+        const F = (s1/X_t)**2 + (s2_/Y_t)**2 + (t12/S_shear)**2 - (s1*s2_)/(X_t*Y_t);
+        const safety = 1/Math.sqrt(Math.max(F, 1e-9));
+        layerStresses.push({idx:i, angle:l.angle, s1, s2:s2_, t12, F, safety});
+        if(safety < minSF){ minSF = safety; criticalLayer = i; criticalAngle = l.angle; }
+      });
+
+      const sfClass = minSF>=2?'good':minSF>=1.2?'warn':'bad';
+
+      const html=`
+        <div class="card">
+          <div class="card-title"><span class="ic">📊</span>Эффективные свойства ламината (A-матрица)</div>
+          <div class="result-grid">
+            <div class="stat"><div class="stat-label">E_x (продольный)</div><div class="stat-value accent">${Ex_eff.toFixed(1)}<span class="stat-unit">ГПа</span></div></div>
+            <div class="stat"><div class="stat-label">E_y (поперечный)</div><div class="stat-value">${Ey_eff.toFixed(1)}<span class="stat-unit">ГПа</span></div></div>
+            <div class="stat"><div class="stat-label">G_xy (сдвиг)</div><div class="stat-value">${Gxy_eff.toFixed(2)}<span class="stat-unit">ГПа</span></div></div>
+            <div class="stat"><div class="stat-label">ν_xy (Пуассон)</div><div class="stat-value">${nuxy_eff.toFixed(3)}</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="ic">🏗️</span>Изгибная жёсткость (B и D-матрицы)</div>
+          <div class="result-grid tight">
+            <div class="stat"><div class="stat-label">D₁₁ (изгиб X)</div><div class="stat-value small">${D11.toFixed(1)}<span class="stat-unit">ГПа·мм³</span></div></div>
+            <div class="stat"><div class="stat-label">D₂₂ (изгиб Y)</div><div class="stat-value small">${D22.toFixed(1)}<span class="stat-unit">ГПа·мм³</span></div></div>
+            <div class="stat"><div class="stat-label">D₁₂ (связь)</div><div class="stat-value small">${D12.toFixed(1)}<span class="stat-unit">ГПа·мм³</span></div></div>
+            <div class="stat"><div class="stat-label">B₁₁ (связь с изгибом)</div><div class="stat-value small ${Math.abs(B11)<0.1?'good':'warn'}">${B11.toFixed(2)}</div></div>
+          </div>
+          <p style="font-size:.85rem;color:var(--muted);margin-top:14px;line-height:1.65">
+            <b>B-матрица</b> описывает связь растяжения с изгибом. Если B₁₁ ≈ 0 — ламинат работает чисто на растяжение. Симметричная укладка (+θ / −θ) обнуляет B.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="ic">💥</span>Прогноз прочности по критерию Цая-Хилла</div>
+          <div class="warning-box ${sfClass}">
+            <span class="wicon">${sfClass==='good'?'✅':sfClass==='warn'?'⚠️':'❌'}</span>
+            <div>
+              <b>Минимальный запас прочности: ${minSF.toFixed(2)}</b><br>
+              Критический слой: <b>#${criticalLayer+1}</b> при ${criticalAngle}° — разрушится первым.
+            </div>
+          </div>
+          <h3 style="margin-top:14px">Запас прочности по слоям (при растяжении 100 МПа)</h3>
+          <div class="table-wrap"><table>
+            <tr><th>#</th><th>Угол</th><th>σ₁, МПа</th><th>σ₂, МПа</th><th>τ₁₂, МПа</th><th>Запас</th><th>Статус</th></tr>
+            ${layerStresses.map(s=>`
+              <tr>
+                <td class="mono">#${s.idx+1}</td>
+                <td class="mono">${s.angle}°</td>
+                <td class="mono">${s.s1.toFixed(1)}</td>
+                <td class="mono">${s.s2.toFixed(1)}</td>
+                <td class="mono">${s.t12.toFixed(1)}</td>
+                <td class="mono"><b>${s.safety.toFixed(2)}</b></td>
+                <td>${s.safety>=2?'<span class="badge good">норма</span>':s.safety>=1.2?'<span class="badge warn">запас</span>':'<span class="badge bad">риск</span>'}</td>
+              </tr>`).join('')}
+          </table></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="ic">🔬</span>Параметры однонаправленного слоя</div>
+          <div class="table-wrap"><table>
+            <tr><th>Параметр</th><th>Значение</th></tr>
+            <tr><td>E₁ (вдоль волокна)</td><td class="mono">${E1.toFixed(1)} ГПа</td></tr>
+            <tr><td>E₂ (поперёк волокна)</td><td class="mono">${E2.toFixed(1)} ГПа</td></tr>
+            <tr><td>G₁₂ (сдвиг)</td><td class="mono">${G12.toFixed(2)} ГПа</td></tr>
+            <tr><td>ν₁₂ (Пуассон)</td><td class="mono">${nu12.toFixed(3)}</td></tr>
+            <tr><td>X_t (прочность вдоль)</td><td class="mono">${X_t.toFixed(0)} МПа</td></tr>
+            <tr><td>Y_t (прочность поперёк)</td><td class="mono">${Y_t.toFixed(0)} МПа</td></tr>
+            <tr><td>S (прочность при сдвиге)</td><td class="mono">${S_shear.toFixed(0)} МПа</td></tr>
+            <tr><td>Плотность пакета</td><td class="mono">${rho.toFixed(3)} г/см³</td></tr>
+            <tr><td>Толщина ламината</td><td class="mono">${totalT.toFixed(2)} мм</td></tr>
+            <tr><td>Количество слоёв</td><td class="mono">${layers.length}</td></tr>
+          </table></div>
+          <h3 style="margin-top:20px">🔍 Проверка структуры</h3>
+          <p style="font-size:.92rem">
+            ${symmetric
+              ? '✅ <b style="color:#4ade80">Ламинат симметричный</b> — связь растяжения с изгибом отсутствует (B = 0).'
+              : '⚠️ <b style="color:#fbbf24">Ламинат несимметричный</b> — возможна связь растяжения с изгибом.'}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="ic">⚖️</span>Сравнение с эталонами</div>
+          ${comparisonBars(Ex_eff, rho, f.name+' (ламинат)')}
+        </div>
+      `;
+      document.getElementById('constructor-result').innerHTML=html;
+      lastConstructor={
+        fiber:f.name, vf, layers:layers.map(l=>({...l})),
+        Ex_eff, Ey_eff, Gxy_eff, rho, totalT, nuxy_eff, symmetric,
+        A:{A11,A22,A12,A66}, B:{B11,B22,B12,B66}, D:{D11,D22,D12,D66},
+        X_t, Y_t, S_shear, minSF, criticalLayer, criticalAngle, layerStresses
+      };
+      showToast('Полный CLT-расчёт выполнен');
+    } finally {
+      btn.classList.remove('loading');
+    }
+  }, 200);
+}
+
+let lastProcess=null;
+function runProcess(){
+  const btn=document.getElementById('btn-process');
+  btn.classList.add('loading');
+  setTimeout(()=>{
+    try{
+      const method=document.getElementById('p_method').value;
+      const mu0=parseFloat(document.getElementById('p_mu').value);
+      const dP_bar=parseFloat(document.getElementById('p_dp').value);
+      const d_f=parseFloat(document.getElementById('p_df').value)*1e-6;
+      const eps=parseFloat(document.getElementById('p_eps').value);
+      const L=parseFloat(document.getElementById('p_L').value);
+      const n_inlet=parseInt(document.getElementById('p_n').value);
+      const h_layup=parseFloat(document.getElementById('p_h').value)/1000;
+      const T=parseFloat(document.getElementById('p_T').value);
+      if([mu0,dP_bar,d_f,eps,L,n_inlet,h_layup,T].some(isNaN)){showToast('Заполните все параметры', 'error');return;}
+
+      const kKozeny=5;
+      const K_tissue = (d_f*d_f * Math.pow(eps,3)) / (16 * kKozeny * Math.pow(1-eps,2));
+      const K_mesh = K_tissue * 50;
+
+      const mu=mu0*Math.exp(-0.03*(T-25));
+      const muPa=mu*1e-3;
+      const dP=dP_bar*1e5;
+
+      const L_flow = L / Math.sqrt(n_inlet);
+
+      const t_mesh = (L_flow*L_flow * muPa) / (K_mesh * dP);
+      const t_thick = (h_layup*h_layup * muPa) / (K_tissue * dP);
+      const t_fill = t_mesh + t_thick;
+
+      const t_gel = Math.max(120, 3600*Math.exp(-0.05*(T-25)));
+      const t_working = t_gel * 0.65;
+      const ratio = t_fill / t_working;
+
+      let porosity=0;
+      if(dP_bar<0.5) porosity=8+(0.5-dP_bar)*20;
+      else if(dP_bar<0.8) porosity=3+(0.8-dP_bar)*10;
+      else porosity=Math.max(0.3, 3-(dP_bar-0.8)*5);
+      porosity=Math.min(15, Math.max(0.2, porosity));
+
+      let quality, qualityClass;
+      if(ratio<0.5 && porosity<3){ quality='Отличное качество'; qualityClass='good'; }
+      else if(ratio<0.9 && porosity<6){ quality='Приемлемое качество'; qualityClass='warn'; }
+      else { quality='Высокий риск дефектов'; qualityClass='bad'; }
+
+      const recs=[];
+      if(ratio>0.8) recs.push('Увеличьте число точек впуска или перепад давления');
+      if(T<30) recs.push('Повысьте температуру — снизится вязкость смолы');
+      if(dP_bar<0.8) recs.push('Проверьте герметичность: вакуум ниже рекомендуемого');
+      if(porosity>3) recs.push('Оптимизируйте схему подачи смолы');
+      if(eps<0.45) recs.push('Увеличьте пористость ткани — смола легче пройдёт');
+
+      const methodNames={infusion:'Вакуумная инфузия',rtm:'RTM (закачка в форму)',winding:'Намотка волокна'};
+
+      const html=`
+        <div class="card">
+          <div class="card-title"><span class="ic">🧪</span>Результаты моделирования</div>
+          <div class="result-grid">
+            <div class="stat"><div class="stat-label">Время пропитки</div><div class="stat-value">${t_fill.toFixed(0)}<span class="stat-unit">сек</span></div></div>
+            <div class="stat"><div class="stat-label">Рабочее время смолы</div><div class="stat-value">${t_working.toFixed(0)}<span class="stat-unit">сек</span></div></div>
+            <div class="stat"><div class="stat-label">Прогноз пористости</div><div class="stat-value">${porosity.toFixed(1)}<span class="stat-unit">%</span></div></div>
+            <div class="stat"><div class="stat-label">Общее качество</div><div class="stat-value ${qualityClass} small">${quality}</div></div>
+          </div>
+
+          <h3>🔬 Физика процесса</h3>
+          <div class="table-wrap"><table>
+            <tr><th>Параметр</th><th>Значение</th><th>Оценка</th></tr>
+            <tr><td>Метод</td><td>${methodNames[method]}</td><td>—</td></tr>
+            <tr><td>Проницаемость ткани (Камен-Козени)</td><td class="mono">${(K_tissue*1e12).toFixed(3)} ×10⁻¹² м²</td><td>—</td></tr>
+            <tr><td>Проницаемость сетки</td><td class="mono">${(K_mesh*1e12).toFixed(2)} ×10⁻¹² м²</td><td>—</td></tr>
+            <tr><td>Эффективная длина пропитки</td><td class="mono">${L_flow.toFixed(3)} м</td><td><span class="badge info">сеть</span></td></tr>
+            <tr><td>Время по сетке</td><td class="mono">${t_mesh.toFixed(0)} сек</td><td>—</td></tr>
+            <tr><td>Время по толщине</td><td class="mono">${t_thick.toFixed(0)} сек</td><td>—</td></tr>
+            <tr><td>Отношение t_fill / t_working</td><td class="mono">${ratio.toFixed(3)}</td>
+              <td>${ratio<0.5?'<span class="badge good">успеет</span>':ratio<0.9?'<span class="badge warn">на грани</span>':'<span class="badge bad">риск</span>'}</td></tr>
+            <tr><td>Вязкость при ${T}°C</td><td class="mono">${mu.toFixed(0)} мПа·с</td>
+              <td>${mu<200?'<span class="badge good">низкая</span>':mu<500?'<span class="badge warn">средняя</span>':'<span class="badge bad">высокая</span>'}</td></tr>
+          </table></div>
+
+          ${recs.length?`<h3 style="margin-top:20px">💡 Рекомендации</h3>
+          <ul style="margin-left:20px;color:var(--muted);font-size:.9rem;line-height:1.9">
+            ${recs.map(r=>`<li>${r}</li>`).join('')}
+          </ul>`:''}
+        </div>
+      `;
+      document.getElementById('process-result').innerHTML=html;
+      lastProcess={
+        method, methodName:methodNames[method],
+        mu0, dP_bar, K_tissue:K_tissue*1e12, K_mesh:K_mesh*1e12,
+        df:d_f*1e6, eps, L, n_inlet, h_layup:h_layup*1000, T,
+        t_fill, t_working, t_gel, t_mesh, t_thick, L_flow,
+        porosity, ratio, quality, mu, recs
+      };
+      showToast('Процесс смоделирован');
+    } finally {
+      btn.classList.remove('loading');
+    }
+  }, 250);
+}
+
+function toggleAcc(el){
+  const body=el.nextElementSibling;
+  const arrow=el.querySelector('.arrow');
+  const acc=el.parentElement;
+  body.classList.toggle('open');
+  acc.classList.toggle('open');
+  arrow.style.transform=body.classList.contains('open')?'rotate(180deg)':'';
+}
+
+function resetMode(mode){
+  if(mode==='reverse'){
+    document.getElementById('r_E').value=45;
+    document.getElementById('r_rho').value=1.9;
+    document.getElementById('r_vfmax').value=0.65;
+    document.getElementById('reverse-result').innerHTML='';
+    document.querySelectorAll('#reverse-presets .preset-chip').forEach(c=>c.classList.remove('active'));
+    lastReverse=null;
+  } else if(mode==='constructor'){
+    layers=[]; renderLayers();
+    document.getElementById('constructor-result').innerHTML='';
+    document.querySelectorAll('#constructor-presets .preset-chip').forEach(c=>c.classList.remove('active'));
+    lastConstructor=null;
+  } else if(mode==='process'){
+    document.getElementById('p_mu').value=300;
+    document.getElementById('p_dp').value=0.9;
+    document.getElementById('p_df').value=15;
+    document.getElementById('p_eps').value=0.5;
+    document.getElementById('p_L').value=0.4;
+    document.getElementById('p_n').value=4;
+    document.getElementById('p_h').value=5;
+    document.getElementById('p_T').value=25;
+    document.getElementById('process-result').innerHTML='';
+    document.querySelectorAll('#process-presets .preset-chip').forEach(c=>c.classList.remove('active'));
+    lastProcess=null;
+  }
+  showToast('Параметры сброшены', 'info');
+}
+
+async function exportPDF(mode){
+  let title='', subtitle='', tables=[];
+  const date=new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+
+  if(mode==='reverse'){
+    if(!lastReverse){ showToast('Сначала выполните подбор', 'error'); return; }
+    const d=lastReverse;
+    title='Обратный подбор состава';
+    subtitle=`${d.fiber} + ${d.matrix}`;
+    tables.push({
+      head:['Параметр','Цель','Прогноз','Отклонение'],
+      rows:[
+        ['Объёмная доля волокна Vf','—',(d.vf*100).toFixed(1)+'%','—'],
+        ['Объёмная доля матрицы','—',(d.vm*100).toFixed(1)+'%','—'],
+        ['Модуль E_x, ГПа',String(d.E_target),d.Ex.toFixed(2),(d.dE*100).toFixed(2)+'%'],
+        ['Модуль E_y, ГПа','—',d.Ey.toFixed(2),'—'],
+        ['Плотность, г/см³',String(d.rho_target),d.rho.toFixed(3),(d.dRho*100).toFixed(2)+'%'],
+        ['Прочность (оценка), МПа','—',d.sigma.toFixed(0),'—'],
+        ['Решений на Парето-фронте','—',String(d.paretoCount),'—']
+      ]
+    });
+    if(d.alts){
+      tables.push({head:['Альтернатива','Vf','V матрицы','E_x, ГПа','ρ, г/см³','Отклонение'],
+        rows:d.alts.map((a,i)=>['#'+(i+1),(a.vf*100).toFixed(0)+'%',(a.vm*100).toFixed(0)+'%',a.Ex.toFixed(1),a.rho.toFixed(2),(a.score*100).toFixed(2)+'%'])});
+    }
+  }
+  else if(mode==='constructor'){
+    if(!lastConstructor){ showToast('Сначала рассчитайте ламинат', 'error'); return; }
+    const d=lastConstructor;
+    title='Цифровой конструктор ламината (полная CLT)';
+    subtitle=`${d.fiber} · Vf = ${d.vf} · ${d.layers.length} слоёв`;
+    tables.push({
+      head:['Параметр','Значение','Ед.'],
+      rows:[
+        ['E_x (продольный)',d.Ex_eff.toFixed(2),'ГПа'],
+        ['E_y (поперечный)',d.Ey_eff.toFixed(2),'ГПа'],
+        ['G_xy (сдвиг)',d.Gxy_eff.toFixed(3),'ГПа'],
+        ['ν_xy (Пуассон)',d.nuxy_eff.toFixed(3),'—'],
+        ['D₁₁ (изгиб X)',d.D.D11.toFixed(1),'ГПа·мм³'],
+        ['D₂₂ (изгиб Y)',d.D.D22.toFixed(1),'ГПа·мм³'],
+        ['B₁₁ (связь растяжения-изгиба)',d.B.B11.toFixed(2),'—'],
+        ['Минимальный запас прочности',d.minSF.toFixed(2),'—'],
+        ['Критический слой','#'+(d.criticalLayer+1)+' ('+d.criticalAngle+'°)','—'],
+        ['Плотность пакета',d.rho.toFixed(3),'г/см³'],
+        ['Толщина ламината',d.totalT.toFixed(2),'мм'],
+        ['Симметрия',d.symmetric?'да':'нет','—']
+      ]
+    });
+    tables.push({
+      head:['#','Угол','σ₁ МПа','σ₂ МПа','τ₁₂ МПа','Запас'],
+      rows:d.layerStresses.map(s=>['#'+(s.idx+1),s.angle+'°',s.s1.toFixed(1),s.s2.toFixed(1),s.t12.toFixed(1),s.safety.toFixed(2)])
+    });
+  }
+  else if(mode==='process'){
+    if(!lastProcess){ showToast('Сначала смоделируйте процесс', 'error'); return; }
+    const d=lastProcess;
+    title='Цифровой двойник процесса';
+    subtitle=`${d.methodName} · T = ${d.T}°C · ΔP = ${d.dP_bar} бар`;
+    tables.push({
+      head:['Параметр','Значение','Оценка'],
+      rows:[
+        ['Проницаемость ткани (Камен-Козени)',d.K_tissue.toFixed(3)+' ×10⁻¹² м²','—'],
+        ['Проницаемость сетки',d.K_mesh.toFixed(2)+' ×10⁻¹² м²','—'],
+        ['Эффективная длина пропитки',d.L_flow.toFixed(3)+' м','—'],
+        ['Время по сетке',d.t_mesh.toFixed(0)+' сек','—'],
+        ['Время по толщине',d.t_thick.toFixed(0)+' сек','—'],
+        ['Общее время пропитки',d.t_fill.toFixed(0)+' сек','—'],
+        ['Рабочее время смолы',d.t_working.toFixed(0)+' сек','—'],
+        ['Отношение t_fill/t_working',d.ratio.toFixed(3),d.ratio<0.5?'успеет':d.ratio<0.9?'на грани':'риск'],
+        ['Прогноз пористости',d.porosity.toFixed(1)+'%',d.porosity<3?'отлично':d.porosity<6?'приемлемо':'высокая'],
+        ['Вязкость при T',d.mu.toFixed(0)+' мПа·с','—'],
+        ['Общее качество',d.quality,'—']
+      ]
+    });
+    if(d.recs&&d.recs.length){
+      tables.push({head:['№','Рекомендация'],rows:d.recs.map((r,i)=>[String(i+1),r])});
+    }
+  }
+
+  showToast('Формируем PDF…', 'info');
+  const report=document.createElement('div');
+  report.style.cssText=`position:fixed;left:-10000px;top:0;width:820px;background:#ffffff;color:#111827;font-family:'Inter','Segoe UI',Arial,sans-serif;padding:48px 44px;box-sizing:border-box;line-height:1.5;`;
+
+  report.innerHTML=`
+    <div style="display:flex;align-items:center;gap:14px;padding-bottom:20px;border-bottom:3px solid #00b8e6;margin-bottom:26px">
+      <div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#00d4ff,#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800">VQ</div>
+      <div>
+        <div style="font-size:1.5rem;font-weight:800;letter-spacing:-.02em;color:#0a0e1a">КомпозитЛаб</div>
+        <div style="font-size:.8rem;color:#6b7280;margin-top:2px">VAMPIQ · Виртуальная платформа проектирования композитов · 2026</div>
+      </div>
+    </div>
+    <h1 style="font-size:1.6rem;margin:0 0 6px;color:#0a0e1a;letter-spacing:-.02em">${title}</h1>
+    <div style="font-size:.9rem;color:#6b7280;margin-bottom:4px">${subtitle}</div>
+    <div style="font-size:.78rem;color:#9ca3af;margin-bottom:26px">Дата экспорта: ${date}</div>
+    ${tables.map(t=>`
+      <table style="width:100%;border-collapse:collapse;margin-bottom:22px;font-size:.85rem">
+        <thead><tr>${t.head.map(h=>`<th style="background:#0a0e1a;color:#fff;padding:10px 12px;text-align:left;font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">${h}</th>`).join('')}</tr></thead>
+        <tbody>${t.rows.map((r,i)=>`<tr style="background:${i%2?'#f9fafb':'#ffffff'}">${r.map((c,j)=>`<td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;color:#111827;${j===0?'font-weight:500':''}">${c}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>
+    `).join('')}
+    <div style="margin-top:36px;padding-top:20px;border-top:1px solid #e5e7eb;font-size:.72rem;color:#9ca3af;display:flex;justify-content:space-between">
+      <div>© 2026 КомпозитЛаб · VAMPIQ · Виртуальная платформа проектирования композитов</div>
+      <div>Автор: Пивнев Илья Викторович</div>
+    </div>`;
+  document.body.appendChild(report);
+
+  try{
+    const canvas=await html2canvas(report,{scale:2,backgroundColor:'#ffffff',logging:false,useCORS:true});
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const pageW=pdf.internal.pageSize.getWidth();
+    const pageH=pdf.internal.pageSize.getHeight();
+    const imgW=pageW;
+    const imgH=(canvas.height*imgW)/canvas.width;
+    const imgData=canvas.toDataURL('image/jpeg',0.95);
+    let heightLeft=imgH, position=0;
+    pdf.addImage(imgData,'JPEG',0,position,imgW,imgH);
+    heightLeft-=pageH;
+    while(heightLeft>0){ position=heightLeft-imgH; pdf.addPage(); pdf.addImage(imgData,'JPEG',0,position,imgW,imgH); heightLeft-=pageH; }
+    const modeNames={reverse:'Подбор',constructor:'Ламинат',process:'Процесс'};
+    pdf.save(`КомпозитЛаб_${modeNames[mode]}_${Date.now()}.pdf`);
+    showToast('PDF сохранён');
+  } catch(err){
+    console.error(err);
+    showToast('Ошибка при создании PDF', 'error');
+  } finally {
+    document.body.removeChild(report);
+  }
+}
+
+renderPresets();
+renderLayers();
+window.addEventListener('resize', ()=>{
+  if(lastReverse && document.getElementById('chart-reverse')){
+    const fiberKey=document.getElementById('r_fiber').value;
+    const matrixKey=document.getElementById('r_matrix').value;
+    const E_target=parseFloat(document.getElementById('r_E').value);
+    const vf_max=parseFloat(document.getElementById('r_vfmax').value);
+    const f=MATERIALS.fibers[fiberKey];
+    const m=MATERIALS.matrices[matrixKey];
+    const candidates=[];
+    for(let vf=0.20; vf<=vf_max+1e-9; vf+=0.02){
+      const vm=1-vf;
+      candidates.push({vf, Ex:vf*f.E+vm*m.E, rho:vf*f.rho+vm*m.rho});
+    }
+    drawChartReverse(candidates, E_target, lastReverse.vf);
+    const pareto=candidates.filter(c=>!candidates.some(o=>o.Ex>c.Ex && o.rho<c.rho));
+    drawChartPareto(pareto.sort((a,b)=>a.rho-b.rho), {vf:lastReverse.vf});
+  }
+});
+</script>
+</body>
+</html>
